@@ -42,7 +42,7 @@ public class SecurityConfig {
         http.headers(config -> config.frameOptions(config2 -> config2.disable()));
         http.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(config ->
-                config.requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**", "/sign-up").permitAll()
+                config.requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**", "/member/sign-up").permitAll()
                         .anyRequest().hasAuthority("ROLE_USER"));
 
         // 원래 스프링 시큐리티 필터 순서가 LogoutFilter 이후에 로그인 필터 동작
