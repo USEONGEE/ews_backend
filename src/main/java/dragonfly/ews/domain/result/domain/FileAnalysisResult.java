@@ -14,4 +14,9 @@ public class FileAnalysisResult {
     @JoinColumn(name = "file_log_id")
     private MemberFileLog memberFileLog;
     private String savedName;
+
+    public FileAnalysisResult(MemberFileLog memberFileLog, String savedName) {
+        this.memberFileLog = memberFileLog;
+        this.savedName = savedName;
+    }
 }
