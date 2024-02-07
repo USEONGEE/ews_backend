@@ -4,6 +4,7 @@ import dragonfly.ews.domain.base.BaseEntity;
 import dragonfly.ews.domain.file.exception.ExtensionNotFoundException;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.member.domain.Member;
+import dragonfly.ews.domain.project.domain.Project;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -36,15 +37,19 @@ public class MemberFile extends BaseEntity {
     @JoinColumn(name = "owner_id")
     private Member owner;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "memberFile")
     private List<MemberFileLog> memberFileLogs = new ArrayList<>();
 
-    public MemberFile(@NotNull String fileName, Member owner, String savedName) {
-        this.fileName = fileName;
-        this.fileType = getFileExt(fileName);
+    public MemberFile(Member owner,@NotNull String originalFilename, String savedFilename) {
+        this.fileName = originalFilename;
+        this.fileType = getFileExt(originalFilename);
         this.owner = owner;
         getOwner().getMemberFiles().add(this);
-        updateFile(savedName);
+        updateFile(savedFilename);
     }
 
     private String getFileExt(String fileName) {
@@ -59,6 +64,14 @@ public class MemberFile extends BaseEntity {
     public void updateFile(@NotNull String savedName) {
         MemberFileLog memberFileLog = new MemberFileLog(this, savedName);
         getMemberFileLogs().add(memberFileLog);
+    }
+
+    public void addProject(@NotNull Project project) {
+        if (getProject() != null) {
+            getProject().getMemberFiles().remove(this);
+        }
+        setProject(project);
+        project.getMemberFiles().add(this);
     }
 
 }

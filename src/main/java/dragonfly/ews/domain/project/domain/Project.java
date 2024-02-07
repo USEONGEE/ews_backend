@@ -29,18 +29,12 @@ public class Project extends BaseEntity {
     private Member owner;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "project")
-    private List<ProjectFile> projectFiles = new ArrayList<>();
+    private List<MemberFile> memberFiles = new ArrayList<>();
 
     public Project(String projectName, Member owner) {
         this.name = projectName;
         this.owner = owner;
         owner.getMyProjects().add(this);
-    }
-
-    // ==편의 메소드==
-    public void addMemberFile(@NotNull MemberFile memberFile) {
-        ProjectFile projectFile = ProjectFile.createProjectFile(this, memberFile);
-        getProjectFiles().add(projectFile);
     }
 
 }

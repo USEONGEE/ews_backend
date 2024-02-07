@@ -1,6 +1,7 @@
 package dragonfly.ews.common.security.service;
 
 
+import dragonfly.ews.common.security.auth.PrincipalDetails;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,6 @@ public class LoginService implements UserDetailsService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 이메일이 존재하지 않습니다."));
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(member.getEmail())
-                .password(member.getPassword())
-                .roles(member.getMemberRole().name())
-                .build();
+        return new PrincipalDetails(member);
     }
 }

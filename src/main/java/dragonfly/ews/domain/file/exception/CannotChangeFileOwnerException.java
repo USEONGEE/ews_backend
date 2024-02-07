@@ -1,5 +1,6 @@
 package dragonfly.ews.domain.file.exception;
 
+@Deprecated
 public class CannotChangeFileOwnerException extends RuntimeException {
     public CannotChangeFileOwnerException() {
     }

@@ -12,6 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Deprecated
 public class ProjectFile extends BaseEntity {
     @Id
     @GeneratedValue

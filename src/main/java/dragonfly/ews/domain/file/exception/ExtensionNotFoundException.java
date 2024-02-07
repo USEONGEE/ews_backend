@@ -1,5 +1,8 @@
 package dragonfly.ews.domain.file.exception;
 
+/**
+ * 파일명에서 확장자를 찾을 수 없을 때 발생하는 예외
+ */
 public class ExtensionNotFoundException extends RuntimeException {
     public ExtensionNotFoundException() {
     }

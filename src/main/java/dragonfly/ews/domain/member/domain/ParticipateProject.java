@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.file.domain;
+package dragonfly.ews.domain.member.domain;
 
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;

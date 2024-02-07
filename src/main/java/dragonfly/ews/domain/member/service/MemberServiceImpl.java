@@ -23,7 +23,7 @@ public class MemberServiceImpl implements MemberService{
                 .password(userSignUpDto.getPassword())
                 .nickname(userSignUpDto.getNickname())
                 .age(userSignUpDto.getAge())
-                .memberRole(MemberRole.USER)
+                .memberRole(MemberRole.ROLE_USER)
                 .build();
 
         member.passwordEncode(passwordEncoder);

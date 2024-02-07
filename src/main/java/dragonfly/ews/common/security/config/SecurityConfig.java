@@ -5,6 +5,7 @@ import dragonfly.ews.common.security.filter.CustomJsonUsernamePasswordAuthentica
 import dragonfly.ews.common.security.filter.JwtAuthenticationProcessingFilter;
 import dragonfly.ews.common.security.handler.LoginFailureHandler;
 import dragonfly.ews.common.security.handler.LoginSuccessHandler;
+import dragonfly.ews.common.security.handler.OAuth2LoginSuccessHandler;
 import dragonfly.ews.common.security.service.JwtService;
 import dragonfly.ews.common.security.service.LoginService;
 import dragonfly.ews.domain.member.repository.MemberRepository;
@@ -18,6 +19,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
@@ -32,6 +34,8 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final PasswordEncoder passwordEncoder;
     private final CorsConfig corsConfig;
+    private final DefaultOAuth2UserService defaultOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -51,7 +55,11 @@ public class SecurityConfig {
         http.addFilter(corsConfig.corsFilter());
         http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
         http.addFilterBefore(jwtAuthenticationProcessingFilter(), CustomJsonUsernamePasswordAuthenticationFilter.class);
-
+        http.oauth2Login(config -> {
+            config.defaultSuccessUrl("/");
+            config.successHandler(oAuth2LoginSuccessHandler);
+            config.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(defaultOAuth2UserService));
+        });
         return http.build();
     }
 

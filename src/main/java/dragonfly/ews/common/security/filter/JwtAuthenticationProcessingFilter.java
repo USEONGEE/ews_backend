@@ -1,5 +1,6 @@
 package dragonfly.ews.common.security.filter;
 
+import dragonfly.ews.common.security.auth.PrincipalDetails;
 import dragonfly.ews.common.security.service.JwtService;
 import dragonfly.ews.common.security.service.PasswordUtil;
 import dragonfly.ews.domain.member.domain.Member;
@@ -19,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -130,14 +132,18 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         if (password == null) { // 소셜 로그인 유저의 비밀번호 임의로 설정 하여 소셜 로그인 유저도 인증 되도록 설정
             password = PasswordUtil.generateRandomPassword();
         }
-        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
-                .username(member.getEmail())
-                .password(password)
-                .roles(member.getMemberRole().name())
-                .build();
+        PrincipalDetails principalDetails = new PrincipalDetails(member);
+        log.info("principalDetails={}",principalDetails.getAuthorities());
+
+//        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+//                .username(member.getEmail())
+//                .password(password)
+//                .roles(member.getMemberRole().name())
+//                .build();
+
         Authentication authentication =
-                new UsernamePasswordAuthenticationToken(userDetailsUser, null,
-                        authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+                new UsernamePasswordAuthenticationToken(principalDetails, null,
+                        authoritiesMapper.mapAuthorities(principalDetails.getAuthorities()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.info("JwtAuthenticationProcessingFilter.saveAuthentication");

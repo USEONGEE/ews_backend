@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Getter
 public class JwtService {
     @Value("${jwt.secretKey}")
     private String secretKey;

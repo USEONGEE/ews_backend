@@ -11,6 +11,18 @@ spring:
     username: sa
     password: 12345
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1061787613738-h9vao1qp0feo8g5c3vbado2ht2n34b20.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            scope: # 사용자에게 리소스 서버에서 획득할 수 있는 권한의 범위를 의미
+              - email
+              - profile
+
 logging:
   level:
     org:
@@ -27,3 +39,6 @@ jwt:
   refresh:
     expiration: 1209600000 #  (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> 하루) * 14(2주))
     header: Authorization-refresh
+
+file:
+  dir: D:/dragonfly/ews/file/

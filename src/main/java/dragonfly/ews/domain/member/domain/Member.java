@@ -1,7 +1,7 @@
 package dragonfly.ews.domain.member.domain;
 
+import dragonfly.ews.domain.base.BaseTimeEntity;
 import dragonfly.ews.domain.file.domain.MemberFile;
-import dragonfly.ews.domain.file.domain.ParticipateProject;
 import dragonfly.ews.domain.project.domain.Project;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @Builder
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue
     @Column(name = "member_id")
@@ -27,6 +27,8 @@ public class Member {
     private int age;
     private String nickname;
     private String refreshToken;
+    private String provider;
+    private String providerId;
 
     @Enumerated(value = EnumType.STRING)
     private MemberRole memberRole;
