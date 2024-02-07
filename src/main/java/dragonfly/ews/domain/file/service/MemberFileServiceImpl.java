@@ -7,6 +7,7 @@ import dragonfly.ews.domain.file.exception.CannotSaveFileException;
 import dragonfly.ews.domain.file.exception.NoFileNameException;
 import dragonfly.ews.domain.file.exception.NoSuchFileException;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
+import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.exception.NoSuchMemberException;
 import dragonfly.ews.domain.member.repository.MemberRepository;
@@ -71,20 +72,23 @@ public class MemberFileServiceImpl implements MemberFileService {
     }
 
     @Override
-    public MemberFile findMemberFileById(Long memberId, Long fileId) {
+    public List<MemberFileLog> findMemberFileById(Long memberId, Long fileId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
-        MemberFile memberFile = memberFileRepository.findById(fileId)
-                .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
+        MemberFile memberFile = memberFileRepository.findMemberFileByIdWithLogs(fileId);
 
         validationFileOwner(member, memberFile);
 
-        return null;
+        return memberFile.getMemberFileLogs();
     }
 
     @Override
     public List<MemberFile> findAll(Long memberId) {
-        return null;
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
+        List<MemberFile> result = memberFileRepository.findByMemberId(member.getId());
+
+        return result;
     }
 
     /**

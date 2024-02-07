@@ -1,13 +1,17 @@
 package dragonfly.ews.domain.file.controller;
 
+import com.google.common.annotations.VisibleForTesting;
 import dragonfly.ews.common.security.auth.PrincipalDetails;
+import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.service.MemberFileService;
+import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +36,24 @@ public class MemberFileController {
         memberFileService.updateFile(file, memberId, fileId);
 
         return "파일업데이트 완료";
+    }
+
+    @VisibleForTesting
+    @GetMapping("/{fileId}/logs/test")
+    public String findFilesLogTest(@PathVariable(value = "fileId") Long fileId,
+                                   @AuthenticationPrincipal(expression = "member") Member member) {
+        Long memberId = member.getId();
+        List<MemberFileLog> memberFileById = memberFileService.findMemberFileById(memberId, fileId);
+
+        return String.valueOf(memberFileById.size());
+    }
+
+    @VisibleForTesting
+    @GetMapping("/all")
+    public String findAllTest(@AuthenticationPrincipal(expression = "member") Member member) {
+        Long memberId = member.getId();
+        List<MemberFile> all = memberFileService.findAll(memberId);
+
+        return String.valueOf(all.size());
     }
 }

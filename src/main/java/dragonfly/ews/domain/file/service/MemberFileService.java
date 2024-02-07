@@ -21,9 +21,10 @@ public interface MemberFileService {
 
     void updateFile(MultipartFile file, Long memberId, Long fileId);
 
-    MemberFile findMemberFileById(Long memberId, Long fileId);
+    List<MemberFileLog> findMemberFileById(Long memberId, Long fileId);
 
     List<MemberFile> findAll(Long memberId);
+
 
     /**
      * 파일 비교를 위한 메소드도 구현해야함
