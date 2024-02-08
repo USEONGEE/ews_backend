@@ -32,10 +32,4 @@ public class MemberFileLog extends BaseEntity {
         this.savedName = savedName;
     }
 
-    // ==편의 메소드==
-    public void addFileAnalysisResult(String savedName) {
-        FileAnalysisResult fileAnalysisResult = new FileAnalysisResult(this, savedName);
-        getFileAnalysisResults().add(fileAnalysisResult);
-    }
-
 }

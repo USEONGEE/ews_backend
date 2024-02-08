@@ -2,15 +2,13 @@ package dragonfly.ews.domain.file.service;
 
 import dragonfly.ews.domain.file.MemberFileUtils;
 import dragonfly.ews.domain.file.domain.MemberFile;
-import dragonfly.ews.domain.file.exception.AccessDeniedException;
-import dragonfly.ews.domain.file.exception.CannotSaveFileException;
-import dragonfly.ews.domain.file.exception.NoFileNameException;
-import dragonfly.ews.domain.file.exception.NoSuchFileException;
+import dragonfly.ews.domain.file.exception.*;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.exception.NoSuchMemberException;
 import dragonfly.ews.domain.member.repository.MemberRepository;
+import dragonfly.ews.domain.project.domain.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,6 +61,8 @@ public class MemberFileServiceImpl implements MemberFileService {
         MemberFile memberFile = memberFileRepository.findById(fileId)
                 .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
 
+        hasProject(memberFile);
+
         validationFileOwner(member, memberFile);
         String savedFilename = memberFileUtils.createSavedFilename(memberFile.getFileName());
 
@@ -89,6 +89,13 @@ public class MemberFileServiceImpl implements MemberFileService {
         List<MemberFile> result = memberFileRepository.findByMemberId(member.getId());
 
         return result;
+    }
+
+    private void hasProject(MemberFile memberFile) {
+        Project project = memberFile.getProject();
+        if (project == null) {
+            throw new FileNotInProjectException("파일이 프로젝트에 포함되지 않았습니다.");
+        }
     }
 
     /**

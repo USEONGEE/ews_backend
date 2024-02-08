@@ -19,6 +19,13 @@ public interface MemberFileService {
      */
     void saveFile(MultipartFile file, Long memberId);
 
+    /**
+     * []
+     * @param file
+     * @param memberId
+     * @param fileId
+     */
+
     void updateFile(MultipartFile file, Long memberId, Long fileId);
 
     List<MemberFileLog> findMemberFileById(Long memberId, Long fileId);
