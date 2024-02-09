@@ -34,4 +34,8 @@ public class FileAnalysisResult {
         memberFileLog.getFileAnalysisResults().add(this);
         this.memberFileLog = memberFileLog;
     }
+
+    public void changeSavedName(String savedName) {
+        this.savedName = savedName;
+    }
 }
