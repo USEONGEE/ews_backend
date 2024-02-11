@@ -44,27 +44,59 @@ public class MemberFile extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "memberFile")
     private List<MemberFileLog> memberFileLogs = new ArrayList<>();
 
-    public MemberFile(Member owner,@NotNull String originalFilename, String savedFilename) {
+    public MemberFile(Member owner, @NotNull String originalFilename, String savedFilename) {
         this.fileName = originalFilename;
         this.fileType = getFileExt(originalFilename);
         this.owner = owner;
         getOwner().getMemberFiles().add(this);
+
+        validateSavedFilename(savedFilename);
         updateFile(savedFilename);
     }
 
+    /**
+     * [파일 확장자 얻어내기]
+     * <p/> 파일에 확장자가 존재하지 않으면 예외 발생
+     * @param fileName
+     * @return
+     * @exception dragonfly.ews.domain.file.exception.ExtensionNotFoundException
+     */
     private String getFileExt(String fileName) {
         int lastDotIndex = fileName.lastIndexOf(".");
-        if (lastDotIndex <  0) {
+        if (lastDotIndex < 0) {
             throw new ExtensionNotFoundException("파일 확장자를 찾을 수 없습니다. 파일 확장자가 파일 이름에 포함되어야합니다.");
         }
         return fileName.substring(lastDotIndex + 1);
     }
 
+    /**
+     * [파일 초기화 및 업데이트 파일명 검사]
+     * <p/>
+     * 파일의 확장자가 기존의 확장자와 같은지, 파일에 확장자가 존재하는 지 확인.
+     * <br/> 파일이 업데이트 및 저장되기 전에 확인되어야 한다.
+     * <br/> 파일의 확장자가 기존과 동일하지 않으면 예외 발생.
+     * 
+     * @exception dragonfly.ews.domain.file.exception.ExtensionNotEqualException
+     */
+    private void validateSavedFilename(String savedFilename) {
+        String ext = getFileExt(savedFilename);
+        if (!ext.equals(getFileType())) {
+            throw new ExtensionNotFoundException("파일의 확장자가 동일해야합니다.");
+        }
+    }
+
     // ==편의 메소드==
-    public void updateFile(@NotNull String savedName) {
-        MemberFileLog memberFileLog = new MemberFileLog(this, savedName);
+    /**
+     * [파일 업데이트 및 로그 엔티티 생성]
+     * @param savedFilename
+     */
+    public void updateFile(@NotNull String savedFilename) {
+        validateSavedFilename(savedFilename);
+        MemberFileLog memberFileLog = new MemberFileLog(this, savedFilename);
         getMemberFileLogs().add(memberFileLog);
     }
+
+
 
     public void addProject(@NotNull Project project) {
         if (getProject() != null) {

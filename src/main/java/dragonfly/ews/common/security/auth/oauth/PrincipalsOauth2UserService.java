@@ -44,12 +44,10 @@ public class PrincipalsOauth2UserService extends DefaultOAuth2UserService {
         Optional<Member> findUser = memberRepository.findByEmail(userInfo.getEmail());
 
         if (findUser.isEmpty()) {
-            Member newMember = Member.builder()
-                    .provider(userInfo.getProvider())
-                    .providerId(userInfo.getProviderId())
-                    .memberRole(MemberRole.ROLE_USER)
-                    .email(userInfo.getEmail())
-                    .password(passwordEncoder.encode(userInfo.getProvider())).build();
+            Member newMember = new Member(userInfo.getEmail(), null, MemberRole.ROLE_USER);
+            newMember.addProviderAndId(userInfo.getProvider(), userInfo.getProviderId());
+            newMember.changePassword(passwordEncoder, userInfo.getProvider());
+
             memberRepository.save(newMember);
             return new PrincipalDetails(newMember, oAuth2User.getAttributes());
         }

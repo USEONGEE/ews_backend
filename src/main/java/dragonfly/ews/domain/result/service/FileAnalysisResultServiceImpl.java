@@ -2,7 +2,6 @@ package dragonfly.ews.domain.result.service;
 
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
-import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
 import dragonfly.ews.domain.result.domain.FileAnalysisResult;
 import dragonfly.ews.domain.result.repository.FileAnalysisResultRepository;
@@ -19,11 +18,11 @@ import java.util.List;
 
 /**
  * TODO 예외메시지 국제화
+ * TODO WebClient 예외 처리 4xx, 5xx
  */
 @Service
 @RequiredArgsConstructor
 public class FileAnalysisResultServiceImpl implements FileAnalysisResultService {
-    private final MemberRepository memberRepository;
     private final MemberFileLogRepository memberFileLogRepository;
     private final FileAnalysisResultRepository fileAnalysisResultRepository;
     private final WebClient webClient;
@@ -44,8 +43,7 @@ public class FileAnalysisResultServiceImpl implements FileAnalysisResultService 
 
         // 파일 가져오기
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        MultipartBodyBuilder.PartBuilder file = multipartBodyBuilder.part("file",
-                new FileSystemResource(fileDir + memberFileLog.getSavedName()));
+        multipartBodyBuilder.part("file", new FileSystemResource(fileDir + memberFileLog.getSavedName()));
         MultiValueMap<String, HttpEntity<?>> multipartBody = multipartBodyBuilder.build();
 
         // 비동기 요청 보내기

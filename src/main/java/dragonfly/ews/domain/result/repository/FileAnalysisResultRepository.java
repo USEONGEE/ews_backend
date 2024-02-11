@@ -10,10 +10,11 @@ import java.util.Optional;
 
 public interface FileAnalysisResultRepository extends JpaRepository<FileAnalysisResult, Long> {
 
-    @Query("select far from FileAnalysisResult far where far.id = :fileAnalysisId far.memberFileLog.memberFile.owner.id = :memberId")
+    @Query("select far from FileAnalysisResult far where far.id = :fileAnalysisId and " +
+            "far.memberFileLog.memberFile.owner.id = :memberId")
     Optional<FileAnalysisResult> findResultFileByIdAuth(@Param("memberId") Long memberId,
                                                         @Param("fileAnalysisId") Long fileAnalysisId);
 
-    @Query("select far from FileAnalysisResult far fetch join far.memberFileLog fl where fl.id = :memberFileLogId")
+    @Query("select far from FileAnalysisResult far join fetch far.memberFileLog fl where fl.id = :memberFileLogId")
     List<FileAnalysisResult> findResultFileByFileLogId(@Param("memberFileLogId") Long memberFileLogId);
 }

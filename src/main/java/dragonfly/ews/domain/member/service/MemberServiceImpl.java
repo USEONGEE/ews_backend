@@ -18,16 +18,11 @@ public class MemberServiceImpl implements MemberService{
     public void signUp(MemberSignUpDto userSignUpDto){
         signUpValidation(userSignUpDto);
 
-        Member member = Member.builder()
-                .email(userSignUpDto.getEmail())
-                .password(userSignUpDto.getPassword())
-                .nickname(userSignUpDto.getNickname())
-                .age(userSignUpDto.getAge())
-                .memberRole(MemberRole.ROLE_USER)
-                .build();
+        Member newMember = new Member(userSignUpDto.getEmail(), userSignUpDto.getAge(), MemberRole.ROLE_USER);
+        newMember.changePassword(passwordEncoder, userSignUpDto.getPassword());
+        newMember.changeNickname(userSignUpDto.getNickname());
 
-        member.passwordEncode(passwordEncoder);
-        memberRepository.save(member);
+        memberRepository.save(newMember);
     }
 
     private void signUpValidation(MemberSignUpDto userSignUpDto) {

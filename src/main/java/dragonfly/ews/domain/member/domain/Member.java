@@ -2,6 +2,7 @@ package dragonfly.ews.domain.member.domain;
 
 import dragonfly.ews.domain.base.BaseTimeEntity;
 import dragonfly.ews.domain.file.domain.MemberFile;
+import dragonfly.ews.domain.member.exception.CannotChangePasswordException;
 import dragonfly.ews.domain.project.domain.Project;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,18 +14,18 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter(value = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
-@Builder
-@AllArgsConstructor
 public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue
     @Column(name = "member_id")
     private Long id;
+    @Column(unique = true, updatable = false)
     private String email;
     private String password;
-    private int age;
+    private Integer age;
     private String nickname;
     private String refreshToken;
     private String provider;
@@ -42,7 +43,8 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<ParticipateProject> participateProjects = new ArrayList<>();
 
-    public Member(String email, int age, MemberRole memberRole) {
+
+    public Member(String email, Integer age, MemberRole memberRole) {
         this.email = email;
         this.age = age;
         this.memberRole = memberRole;
@@ -59,8 +61,28 @@ public class Member extends BaseTimeEntity {
 
     /**
      * [비밀번호 암호화]
+     * <p/>같은 비밀번호로는 변경할 수 없다.
+     * @exception CannotChangePasswordException
      */
-    public void passwordEncode(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
+    public void changePassword(PasswordEncoder passwordEncoder, String newPassword) {
+        if (passwordEncoder.matches(newPassword ,getPassword())) {
+            throw new CannotChangePasswordException("같은 비밀번호로 변경할 수 없습니다.");
+        }
+
+        setPassword(passwordEncoder.encode(newPassword));
+        log.info("[Member] 비밀번호 암호화, 비밀번호={}", getPassword());
+    }
+
+    public void changeNickname(String newNickname) {
+        setNickname(newNickname);
+    }
+
+    public void changeMemberRole(MemberRole memberRole) {
+        setMemberRole(memberRole);
+    }
+
+    public void addProviderAndId(String provider, String providerId) {
+        setProvider(provider);
+        setProviderId(providerId);
     }
 }
