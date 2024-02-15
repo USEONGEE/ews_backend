@@ -2,15 +2,20 @@ package dragonfly.ews.domain.filelog.service;
 
 import dragonfly.ews.domain.filelog.controller.ExcelDataDto;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-public class ExcelFileReader implements FileReader<ExcelDataDto> {
+@Component
+public class XlsxFileReader implements FileReader<ExcelDataDto> {
+    @Override
+    public boolean support(String extension) {
+        return extension.equalsIgnoreCase("xlsx") || extension.equalsIgnoreCase("xls");
+    }
+
     @Override
     public ExcelDataDto read(String filePath) {
         ExcelDataDto excelDataDto = new ExcelDataDto();
@@ -18,10 +23,9 @@ public class ExcelFileReader implements FileReader<ExcelDataDto> {
         List<ExcelDataDto.ExcelRowDataDto> rows = new ArrayList<>();
 
         try (FileInputStream fis = new FileInputStream(filePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
+             Workbook workbook = WorkbookFactory.create(fis)) {
             Sheet sheet = workbook.getSheetAt(0);
             boolean isFirstRow = true;
-
             for (Row row : sheet) {
                 if (row.getRowNum() >= 30) break; // 상위 30열까지만 읽음
 
@@ -62,11 +66,11 @@ public class ExcelFileReader implements FileReader<ExcelDataDto> {
                 }
                 isFirstRow = false;
             }
-        } catch (Exception e) {
+        }  catch (IOException e) {
             e.printStackTrace();
         }
         excelDataDto.setColumnNames(columnNames);
-        if (!columnNames.isEmpty()) { // 첫 번째 행이 처리되면, 다음 행부터 데이터로 취급
+        if (!columnNames.isEmpty()) {
             excelDataDto.setRows(rows);
         }
         return excelDataDto;

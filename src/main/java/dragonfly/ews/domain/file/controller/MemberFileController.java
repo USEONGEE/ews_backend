@@ -1,13 +1,11 @@
 package dragonfly.ews.domain.file.controller;
 
 import com.google.common.annotations.VisibleForTesting;
-import dragonfly.ews.common.security.auth.PrincipalDetails;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.domain.MemberFileResponseDto;
 import dragonfly.ews.domain.file.service.MemberFileService;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.member.domain.Member;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,7 +42,7 @@ public class MemberFileController {
     @GetMapping("/{fileId}")
     public ResponseEntity<List<MemberFileResponseDto>> findFile(@PathVariable(value = "fileId") Long fileId,
                                                           @AuthenticationPrincipal(expression = "member") Member member) {
-        List<MemberFileLog> memberFileById = memberFileService.findMemberFileById(member.getId(), fileId);
+        List<MemberFileLog> memberFileById = memberFileService.findMemberFileDetails(member.getId(), fileId);
         List<MemberFileResponseDto> list = memberFileById.stream()
                 .map(MemberFileResponseDto::new)
                 .toList();
@@ -58,7 +55,7 @@ public class MemberFileController {
     public String findFilesLogTest(@PathVariable(value = "fileId") Long fileId,
                                    @AuthenticationPrincipal(expression = "member") Member member) {
         Long memberId = member.getId();
-        List<MemberFileLog> memberFileById = memberFileService.findMemberFileById(memberId, fileId);
+        List<MemberFileLog> memberFileById = memberFileService.findMemberFileDetails(memberId, fileId);
 
         return String.valueOf(memberFileById.size());
     }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class MemberFileLogServiceImpl implements MemberFileLogService {
-    private MemberFileLogRepository memberFileLogRepository;
+    private final MemberFileLogRepository memberFileLogRepository;
 
     @Override
     public MemberFileLog findMemberFileLog(Long memberId, Long memberFileLogId) {

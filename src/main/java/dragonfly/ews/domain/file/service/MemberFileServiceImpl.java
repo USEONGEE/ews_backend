@@ -81,7 +81,7 @@ public class MemberFileServiceImpl implements MemberFileService {
     }
 
     @Override
-    public List<MemberFileLog> findMemberFileById(Long memberId, Long fileId) {
+    public List<MemberFileLog> findMemberFileDetails(Long memberId, Long memberFileId) {
 //        Member member = memberRepository.findById(memberId)
 //                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
 //        MemberFile memberFile = memberFileRepository.findMemberFileByIdWithLogs(fileId)
@@ -89,7 +89,7 @@ public class MemberFileServiceImpl implements MemberFileService {
 //        // TODO validation을 해야하는지 생각해보기
 //        validationFileOwner(member, memberFile);
 
-        MemberFile memberFile = memberFileRepository.findByIdAuth(memberId, fileId)
+        MemberFile memberFile = memberFileRepository.findByIdAuth(memberId, memberFileId)
                 .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
 
         return memberFile.getMemberFileLogs();
@@ -104,13 +104,7 @@ public class MemberFileServiceImpl implements MemberFileService {
         return result;
     }
 
-    @Override
-    public MemberFileLog findMemberFileLogById(Long memberId, Long memberFileLogId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
-        return memberFileLogRepository.findByIdAuth(memberId, memberFileLogId)
-                .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
-    }
+
 
     private void hasProject(MemberFile memberFile) {
         Project project = memberFile.getProject();

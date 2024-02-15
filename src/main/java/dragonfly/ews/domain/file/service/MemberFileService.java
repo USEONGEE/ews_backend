@@ -4,7 +4,6 @@ import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface MemberFileService {
@@ -28,11 +27,9 @@ public interface MemberFileService {
 
     void updateFile(MultipartFile file, Long memberId, Long fileId);
 
-    List<MemberFileLog> findMemberFileById(Long memberId, Long fileId);
+    List<MemberFileLog> findMemberFileDetails(Long memberId, Long memberFileId);
 
     List<MemberFile> findAll(Long memberId);
-
-    MemberFileLog findMemberFileLogById(Long memberId, Long memberFileLogId);
 
 
     /**

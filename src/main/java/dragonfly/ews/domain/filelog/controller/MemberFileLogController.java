@@ -1,6 +1,7 @@
 package dragonfly.ews.domain.filelog.controller;
 
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
+import dragonfly.ews.domain.filelog.service.FileReadManager;
 import dragonfly.ews.domain.filelog.service.FileReader;
 import dragonfly.ews.domain.filelog.service.MemberFileLogService;
 import dragonfly.ews.domain.member.domain.Member;
@@ -26,16 +27,17 @@ public class MemberFileLogController {
     @Value("${file.dir}")
     private String fileDir;
 
-    private MemberFileLogService memberFileLogService;
-    private FileReader fileReader;
+    private final MemberFileLogService memberFileLogService;
+    private final FileReadManager fileReadManager;
 
-    @GetMapping("/fileLogId")
+    @GetMapping("/{fileLogId}")
+
     public ResponseEntity<ExcelDataDto> fetchUserFileContent(
             @PathVariable(value = "fileLogId") Long fileLogId,
             @AuthenticationPrincipal(expression = "member") Member member) {
         MemberFileLog memberFileLog = memberFileLogService.findMemberFileLog(member.getId(), fileLogId);
         String savedName = memberFileLog.getSavedName();
-        ExcelDataDto excelDataDto = (ExcelDataDto) fileReader.read(fileDir + savedName);
+        ExcelDataDto excelDataDto = (ExcelDataDto) fileReadManager.resolve(fileDir + savedName);
         return ResponseEntity.ok(excelDataDto);
     }
 }

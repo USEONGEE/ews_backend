@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -128,6 +129,37 @@ class MemberFileServiceTest {
         MemberFile anotherFile = memberFileService.saveFile(multipartFile, anotherMember.getId());
 
         assertThatThrownBy(() -> memberFileService.updateFile(multipartFile, member.getId(), anotherFile.getId()))
+                .isInstanceOf(NoSuchFileException.class);
+    }
+
+    @Test
+    void findMemberFileDetails_success() {
+        when(multipartFile.getOriginalFilename())
+                .thenReturn("file.txt")
+                .thenReturn("file2.txt");
+        Member member = createMember("s@gmail.com");
+        MemberFile memberFile = memberFileService.saveFile(multipartFile, member.getId());
+        addMemberFileToProject(member, memberFile);
+        memberFileService.updateFile(multipartFile, member.getId(), memberFile.getId());
+
+        List<MemberFileLog> memberFileDetails = memberFileService.findMemberFileDetails(member.getId(), memberFile.getId());
+
+        assertThat(memberFileDetails.size()).isEqualTo(2);
+    }
+
+    @DisplayName("자신의 파일이 아닌 것을 조회하려고하면 예외발생")
+    @Test
+    void findMemberFileDetails_fail_noAuth() {
+        when(multipartFile.getOriginalFilename())
+                .thenReturn("file.txt")
+                .thenReturn("file2.txt");
+        Member member = createMember("s@gmail.com");
+        MemberFile memberFile = memberFileService.saveFile(multipartFile, member.getId());
+        addMemberFileToProject(member, memberFile);
+        memberFileService.updateFile(multipartFile, member.getId(), memberFile.getId());
+
+        Member anotherMember = createMember("ss@gmail.com");
+        assertThatThrownBy(() -> memberFileService.findMemberFileDetails(anotherMember.getId(), memberFile.getId()))
                 .isInstanceOf(NoSuchFileException.class);
     }
 
