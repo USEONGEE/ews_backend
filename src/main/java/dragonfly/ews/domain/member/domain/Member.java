@@ -3,6 +3,7 @@ package dragonfly.ews.domain.member.domain;
 import dragonfly.ews.domain.base.BaseTimeEntity;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.member.exception.CannotChangePasswordException;
+import dragonfly.ews.domain.project.domain.ParticipateProject;
 import dragonfly.ews.domain.project.domain.Project;
 import jakarta.persistence.*;
 import lombok.*;

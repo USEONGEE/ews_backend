@@ -34,13 +34,13 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-
 	// jwt
 	implementation 'com.auth0:java-jwt:4.2.1'
-
 	// test
 	implementation 'com.google.guava:guava:13.0'
-
+	// Apache POI for Excel 파일(.xls, .xlsx) 처리
+	implementation 'org.apache.poi:poi:5.2.2'
+	implementation 'org.apache.poi:poi-ooxml:5.2.2'
 }
 
 tasks.named('test') {

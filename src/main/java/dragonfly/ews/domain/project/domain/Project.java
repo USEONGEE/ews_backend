@@ -33,10 +33,24 @@ public class Project extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "project")
     private List<MemberFile> memberFiles = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "project")
+    private List<ParticipateProject> participateProjects = new ArrayList<>();
+
     public Project(String projectName, Member owner) {
         this.name = projectName;
         this.owner = owner;
         owner.getMyProjects().add(this);
     }
 
+    // ===편의 메소드===
+    public void addParticipants(@NotNull Member member) {
+        ParticipateProject participateProject = new ParticipateProject(this, member);
+        getParticipateProjects().add(participateProject);
+    }
+
+    public void addMemberFile(@NotNull MemberFile memberFile) {
+        memberFile.addProject(this);
+        getMemberFiles().add(memberFile);
+
+    }
 }

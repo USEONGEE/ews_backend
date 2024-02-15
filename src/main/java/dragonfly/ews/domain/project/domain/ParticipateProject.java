@@ -1,10 +1,16 @@
-package dragonfly.ews.domain.member.domain;
+package dragonfly.ews.domain.project.domain;
 
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ParticipateProject {
     @Id
     @GeneratedValue
@@ -19,5 +25,8 @@ public class ParticipateProject {
     @JoinColumn(name = "member_id")
     private Member member;
 
-
+    public ParticipateProject(Project project, Member member) {
+        this.project = project;
+        this.member = member;
+    }
 }

@@ -36,6 +36,9 @@ jwt:
 
 file:
   dir: D:/dragonfly/ews/file/
+  test:
+    dir: D:/dragonfly/ews/testFile/
+
 
 analysis:
   server:

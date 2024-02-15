@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public class MemberFile extends BaseEntity {
     @Id
     @GeneratedValue
@@ -44,7 +46,7 @@ public class MemberFile extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "memberFile")
     private List<MemberFileLog> memberFileLogs = new ArrayList<>();
 
-    public MemberFile(Member owner, @NotNull String originalFilename, String savedFilename) {
+    public MemberFile(@NotNull Member owner, @NotNull String originalFilename, @NotNull String savedFilename) {
         this.fileName = originalFilename;
         this.fileType = getFileExt(originalFilename);
         this.owner = owner;
@@ -96,11 +98,10 @@ public class MemberFile extends BaseEntity {
         getMemberFileLogs().add(memberFileLog);
     }
 
-
-
     public void addProject(@NotNull Project project) {
         if (getProject() != null) {
             getProject().getMemberFiles().remove(this);
+            log.info("[MemberFile] 프로젝트와의 연관관계가 제거되었습니다.");
         }
         setProject(project);
         project.getMemberFiles().add(this);
