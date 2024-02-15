@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.filelog.service;
+package dragonfly.ews.domain.filelog.exception;
 
 public class CannotResolveFileReadException extends RuntimeException {
     public CannotResolveFileReadException() {
