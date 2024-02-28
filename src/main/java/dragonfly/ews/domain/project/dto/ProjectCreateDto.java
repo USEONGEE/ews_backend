@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.project.controlelr;
+package dragonfly.ews.domain.project.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

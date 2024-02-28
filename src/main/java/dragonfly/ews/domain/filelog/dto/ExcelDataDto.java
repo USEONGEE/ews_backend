@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.filelog.controller;
+package dragonfly.ews.domain.filelog.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

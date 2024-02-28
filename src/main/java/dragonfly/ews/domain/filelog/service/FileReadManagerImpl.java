@@ -1,7 +1,7 @@
 package dragonfly.ews.domain.filelog.service;
 
 import dragonfly.ews.domain.file.FileUtils;
-import dragonfly.ews.domain.filelog.controller.ExcelDataDto;
+import dragonfly.ews.domain.filelog.dto.ExcelDataDto;
 import dragonfly.ews.domain.filelog.exception.CannotResolveFileReadException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

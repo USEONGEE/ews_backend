@@ -14,8 +14,16 @@ public class MemberFileLogServiceImpl implements MemberFileLogService {
     private final MemberFileLogRepository memberFileLogRepository;
 
     @Override
-    public MemberFileLog findMemberFileLog(Long memberId, Long memberFileLogId) {
+    public MemberFileLog findById(Long memberId, Long memberFileLogId) {
         return memberFileLogRepository.findByIdAuth(memberId, memberFileLogId)
+                .orElseThrow(() -> new NoSuchFileException("파일이 존재하지 않습니다."));
+    }
+
+    @Override
+    public MemberFileLog findByIdContainResults(Long memberId, Long memberFileLogId) {
+        memberFileLogRepository.findByIdAuth(memberId, memberFileLogId)
+                .orElseThrow(() -> new NoSuchFileException("파일이 존재하지 않습니다."));
+        return memberFileLogRepository.findByIdContainResult(memberFileLogId)
                 .orElseThrow(() -> new NoSuchFileException("파일이 존재하지 않습니다."));
     }
 }

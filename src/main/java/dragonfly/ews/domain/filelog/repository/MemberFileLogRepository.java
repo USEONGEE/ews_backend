@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface MemberFileLogRepository extends JpaRepository<MemberFileLog, Long> {
@@ -17,6 +16,6 @@ public interface MemberFileLogRepository extends JpaRepository<MemberFileLog, Lo
     Optional<MemberFileLog> findByIdAuth(@Param("memberId") Long memberId,
                                          @Param("memberFileLogId") Long memberFileLogId);
 
-    @Query("select mfl from MemberFileLog mfl join fetch mfl.fileAnalysisResults far where mfl.id = :memberFileLogId")
-    List<MemberFileLog> findByIdContainResult(@Param("memberFileLogId") Long memberFileLogId);
+    @Query("select mfl from MemberFileLog mfl join fetch mfl.analysisResults far where mfl.id = :memberFileLogId")
+    Optional<MemberFileLog> findByIdContainResult(@Param("memberFileLogId") Long memberFileLogId);
 }

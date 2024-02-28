@@ -1,6 +1,7 @@
 package dragonfly.ews.domain.member.controller;
 
 import com.google.common.annotations.VisibleForTesting;
+import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.domain.MemberSignUpDto;
 import dragonfly.ews.domain.member.repository.MemberRepository;
@@ -27,7 +28,7 @@ public class MemberController {
      * @exception RuntimeException 회원 가입에 실패했을 시
      */
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestBody MemberSignUpDto memberSignUpDto) {
+    public ResponseEntity<SuccessResponse> signUp(@RequestBody MemberSignUpDto memberSignUpDto) {
         memberService.signUp(memberSignUpDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

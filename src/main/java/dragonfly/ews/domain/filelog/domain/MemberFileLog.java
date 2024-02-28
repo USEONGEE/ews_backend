@@ -2,7 +2,7 @@ package dragonfly.ews.domain.filelog.domain;
 
 import dragonfly.ews.domain.base.BaseEntity;
 import dragonfly.ews.domain.file.domain.MemberFile;
-import dragonfly.ews.domain.result.domain.FileAnalysisResult;
+import dragonfly.ews.domain.result.domain.AnalysisResult;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,7 +25,7 @@ public class MemberFileLog extends BaseEntity {
     private String savedName;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "memberFileLog")
-    private List<FileAnalysisResult> fileAnalysisResults = new ArrayList<>();
+    private List<AnalysisResult> analysisResults = new ArrayList<>();
 
     public MemberFileLog(MemberFile memberFile, String savedName) {
         this.memberFile = memberFile;

@@ -1,7 +1,6 @@
 package dragonfly.ews.domain.file.service;
 
 import dragonfly.ews.domain.file.domain.MemberFile;
-import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -16,7 +15,7 @@ public interface MemberFileService {
      * @param file
      * @param memberId
      */
-    MemberFile saveFile(MultipartFile file, Long memberId);
+    boolean saveFile(MultipartFile file, Long memberId);
 
     /**
      * []
@@ -25,9 +24,9 @@ public interface MemberFileService {
      * @param fileId
      */
 
-    void updateFile(MultipartFile file, Long memberId, Long fileId);
+    boolean updateFile(MultipartFile file, Long memberId, Long fileId);
 
-    List<MemberFileLog> findMemberFileDetails(Long memberId, Long memberFileId);
+    MemberFile findByIdContainLogs(Long memberId, Long memberFileId);
 
     List<MemberFile> findAll(Long memberId);
 

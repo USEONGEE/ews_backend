@@ -1,6 +1,5 @@
 package dragonfly.ews.domain.result.domain;
 
-import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -12,10 +11,10 @@ import lombok.Setter;
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FileAnalysisResult {
+public class AnalysisResult {
     @Id
     @GeneratedValue
-    @Column(name = "file_analysis_result_id")
+    @Column(name = "analysis_result_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,7 +26,7 @@ public class FileAnalysisResult {
     @Enumerated(EnumType.STRING)
     private AnalysisStatus analysisStatus;
 
-    public FileAnalysisResult(MemberFileLog memberFileLog, AnalysisStatus analysisStatus) {
+    public AnalysisResult(MemberFileLog memberFileLog, AnalysisStatus analysisStatus) {
         addMemberFileLog(memberFileLog);
         this.analysisStatus = analysisStatus;
     }
@@ -39,7 +38,7 @@ public class FileAnalysisResult {
      * @param savedName
      */
     public void changeSavedName(String savedName) {
-        changeAnalysisStatus(AnalysisStatus.COMPLETE);
+        changeAnalysisStatus(AnalysisStatus.COMPLETED);
         setSavedName(savedName);
     }
 
@@ -49,7 +48,7 @@ public class FileAnalysisResult {
 
     // == 연관관계 편의 메소드
     private void addMemberFileLog(MemberFileLog memberFileLog) {
-        memberFileLog.getFileAnalysisResults().add(this);
+        memberFileLog.getAnalysisResults().add(this);
         setMemberFileLog(memberFileLog);
     }
 }

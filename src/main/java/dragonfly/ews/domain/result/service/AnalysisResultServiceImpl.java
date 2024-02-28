@@ -3,9 +3,10 @@ package dragonfly.ews.domain.result.service;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
-import dragonfly.ews.domain.result.domain.FileAnalysisResult;
+import dragonfly.ews.domain.result.domain.AnalysisResult;
 import dragonfly.ews.domain.result.exceptioon.CannotProcessAnalysisException;
-import dragonfly.ews.domain.result.repository.FileAnalysisResultRepository;
+import dragonfly.ews.domain.result.exceptioon.NotCompletedException;
+import dragonfly.ews.domain.result.repository.AnalysisResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +28,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
-public class FileAnalysisResultServiceImpl implements FileAnalysisResultService {
+public class AnalysisResultServiceImpl implements AnalysisResultService {
     private final MemberFileLogRepository memberFileLogRepository;
-    private final FileAnalysisResultRepository fileAnalysisResultRepository;
+    private final AnalysisResultRepository analysisResultRepository;
     private final WebClient webClient;
     private final AnalysisResultProcessor analysisResultProcessor;
     @Value("${file.dir}")
@@ -40,25 +41,31 @@ public class FileAnalysisResultServiceImpl implements FileAnalysisResultService 
 
     @Transactional
     @Override
-    public FileAnalysisResult createFileAnalysisResult(Long memberId, Long fileLogId) {
-        MemberFileLog memberFileLog = memberFileLogRepository.findByIdAuth(memberId, fileLogId)
+    public AnalysisResult createAnalysisResult(Long memberId, Long memberFileLogId) {
+        MemberFileLog memberFileLog = memberFileLogRepository.findByIdAuth(memberId, memberFileLogId)
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
-        FileAnalysisResult fileAnalysisResult = new FileAnalysisResult(memberFileLog, AnalysisStatus.CREATED);
-        return fileAnalysisResultRepository.save(fileAnalysisResult);
+        AnalysisResult analysisResult = new AnalysisResult(memberFileLog, AnalysisStatus.CREATED);
+        return analysisResultRepository.save(analysisResult);
     }
 
+    /**
+     * [데이터 분석 요청]
+     * @param memberId
+     * @param analysisResultId
+     * @return
+     */
     @Transactional
     @Override
-    public Long analysis(Long memberId, Long fileAnalysisResultId) {
+    public boolean analysis(Long memberId, Long analysisResultId) {
 
         // 분석 파일 로그 조회
-        FileAnalysisResult fileAnalysisResult = fileAnalysisResultRepository.findResultFileByIdAuth(memberId,
-                        fileAnalysisResultId)
+        AnalysisResult analysisResult = analysisResultRepository.findResultFileByIdAuth(memberId,
+                        analysisResultId)
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
-        validateFileAnalysisStatus(fileAnalysisResult);
+        validateFileAnalysisStatus(analysisResult);
 
         // 파일 가져오기
-        MemberFileLog memberFileLog = fileAnalysisResult.getMemberFileLog();
+        MemberFileLog memberFileLog = analysisResult.getMemberFileLog();
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part("file", new FileSystemResource(fileDir + memberFileLog.getSavedName()));
         MultiValueMap<String, HttpEntity<?>> multipartBody = multipartBodyBuilder.build();
@@ -71,42 +78,52 @@ public class FileAnalysisResultServiceImpl implements FileAnalysisResultService 
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(result ->
-                        analysisResultProcessor.processResult((String) result, (Long) fileAnalysisResult.getId()));
+                        analysisResultProcessor.processResult((String) result, (Long) analysisResult.getId()));
 
-        fileAnalysisResult.changeAnalysisStatus(AnalysisStatus.PROCESSING);
-
-        return fileAnalysisResult.getId();
+        analysisResult.changeAnalysisStatus(AnalysisStatus.PROCESSING);
+        return true;
     }
 
-    private void validateFileAnalysisStatus(FileAnalysisResult fileAnalysisResult) {
-        switch (fileAnalysisResult.getAnalysisStatus()) {
-            case CANCEL -> throw new CannotProcessAnalysisException("분석 요청이 취소된 파일입니다. 관리자에게 문의하세요");
+    private void validateFileAnalysisStatus(AnalysisResult analysisResult) {
+        switch (analysisResult.getAnalysisStatus()) {
+            case CANCELED -> throw new CannotProcessAnalysisException("분석 요청이 취소된 파일입니다. 관리자에게 문의하세요");
             case PROCESSING -> throw new CannotProcessAnalysisException("이미 분석 중인 파일입니다.");
-            case COMPLETE -> throw new CannotProcessAnalysisException("이미 분석된 파일입니다.");
+            case COMPLETED -> throw new CannotProcessAnalysisException("이미 분석된 파일입니다.");
         }
     }
 
+    @Deprecated
     @Override
-    public AnalysisStatus checkAnalysisStatus(Long memberId, Long fileAnalysisResultId) {
-        FileAnalysisResult fileAnalysisResult = fileAnalysisResultRepository.findResultFileByIdAuth(memberId,
-                        fileAnalysisResultId)
+    public AnalysisStatus checkAnalysisStatus(Long memberId, Long analysisResultId) {
+        AnalysisResult analysisResult = analysisResultRepository.findResultFileByIdAuth(memberId,
+                        analysisResultId)
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
-        return fileAnalysisResult.getAnalysisStatus();
+        return analysisResult.getAnalysisStatus();
     }
 
     @Override
-    public FileAnalysisResult findByResultId(Long memberId, Long fileAnalysisResultId) {
-        return fileAnalysisResultRepository.findResultFileByIdAuth(memberId,
-                        fileAnalysisResultId)
+    public AnalysisResult findByResultId(Long memberId, Long analysisResultId) {
+        return analysisResultRepository.findResultFileByIdAuth(memberId,
+                        analysisResultId)
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
     }
 
     @Override
-    public List<FileAnalysisResult> findByFileLogId(Long memberId, Long memberFileLogId) {
+    public List<AnalysisResult> findByFileLogId(Long memberId, Long memberFileLogId) {
         // 해당 유저가 파일 로그에 접근할 권한이 있는지 인증
         memberFileLogRepository.findByIdAuth(memberId, memberFileLogId)
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
 
-        return fileAnalysisResultRepository.findResultFileByFileLogId(memberFileLogId);
+        return analysisResultRepository.findResultFileByFileLogId(memberFileLogId);
+    }
+
+    @Override
+    public AnalysisResult findCompletedFileById(Long memberId, Long analysisResultId) {
+        AnalysisResult analysisResult = analysisResultRepository.findResultFileByIdAuth(memberId, analysisResultId)
+                .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
+        if (analysisResult.getAnalysisStatus() != AnalysisStatus.COMPLETED) {
+            throw new NotCompletedException("분석이 완료된 파일이 아닙니다.");
+        }
+        return analysisResult;
     }
 }

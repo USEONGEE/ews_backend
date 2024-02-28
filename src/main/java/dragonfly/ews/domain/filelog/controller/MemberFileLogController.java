@@ -1,23 +1,19 @@
 package dragonfly.ews.domain.filelog.controller;
 
+import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
+import dragonfly.ews.domain.filelog.dto.ExcelDataDto;
+import dragonfly.ews.domain.filelog.dto.MemberFileLogContainResultsResponseDto;
 import dragonfly.ews.domain.filelog.service.FileReadManager;
-import dragonfly.ews.domain.filelog.service.FileReader;
 import dragonfly.ews.domain.filelog.service.MemberFileLogService;
 import dragonfly.ews.domain.member.domain.Member;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,14 +26,36 @@ public class MemberFileLogController {
     private final MemberFileLogService memberFileLogService;
     private final FileReadManager fileReadManager;
 
-    @GetMapping("/{fileLogId}")
-
-    public ResponseEntity<ExcelDataDto> fetchUserFileContent(
-            @PathVariable(value = "fileLogId") Long fileLogId,
+    /**
+     * [파일로그의 엑셀 데이터를 일부 조회]
+     * @param memberFileLogId
+     * @param member
+     * @return
+     */
+    @GetMapping("/data/{memberFileLogId}")
+    public ResponseEntity<SuccessResponse> fetchUserFileContent(
+            @PathVariable(value = "memberFileLogId") Long memberFileLogId,
             @AuthenticationPrincipal(expression = "member") Member member) {
-        MemberFileLog memberFileLog = memberFileLogService.findMemberFileLog(member.getId(), fileLogId);
+        MemberFileLog memberFileLog = memberFileLogService.findById(member.getId(), memberFileLogId);
         String savedName = memberFileLog.getSavedName();
         ExcelDataDto excelDataDto = (ExcelDataDto) fileReadManager.resolve(fileDir + savedName);
-        return ResponseEntity.ok(excelDataDto);
+
+        return new ResponseEntity<>(SuccessResponse.of(excelDataDto), HttpStatus.OK);
+    }
+
+    /**
+     * [파일로그 세부 조회]
+     * @param memberFileLogId
+     * @param member
+     * @return
+     */
+    @GetMapping("/{memberFileLogId}")
+    public ResponseEntity<SuccessResponse> findByMemberFileLogId(
+            @PathVariable(value = "memberFileLogId") Long memberFileLogId,
+            @AuthenticationPrincipal(expression = "member") Member member) {
+        MemberFileLog memberFileLog = memberFileLogService.findByIdContainResults(member.getId(), memberFileLogId);
+
+        return new ResponseEntity<>(SuccessResponse.of(new MemberFileLogContainResultsResponseDto(memberFileLog)),
+                HttpStatus.OK);
     }
 }

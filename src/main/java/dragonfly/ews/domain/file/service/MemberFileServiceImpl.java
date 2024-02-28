@@ -37,7 +37,7 @@ public class MemberFileServiceImpl implements MemberFileService {
      */
     @Transactional
     @Override
-    public MemberFile saveFile(MultipartFile file, Long memberId) {
+    public boolean saveFile(MultipartFile file, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
 
@@ -50,7 +50,8 @@ public class MemberFileServiceImpl implements MemberFileService {
         MemberFile memberFile = new MemberFile(member, originalFilename, savedFilename);
         memberFileRepository.save(memberFile);
         memberFileUtils.storeFile(file, savedFilename);
-        return memberFile;
+
+        return true;
     }
 
     /**
@@ -62,7 +63,7 @@ public class MemberFileServiceImpl implements MemberFileService {
      */
     @Transactional
     @Override
-    public void updateFile(MultipartFile file, Long memberId, Long fileId) {
+    public boolean updateFile(MultipartFile file, Long memberId, Long fileId) {
 //        Member member = memberRepository.findById(memberId)
 //                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
 //        MemberFile memberFile = memberFileRepository.findById(fileId)
@@ -78,21 +79,16 @@ public class MemberFileServiceImpl implements MemberFileService {
         // 파일 데이터, 파일 메타데이터 저장
         memberFile.updateFile(savedFilename);
         memberFileUtils.storeFile(file, savedFilename);
+
+        return true;
     }
 
     @Override
-    public List<MemberFileLog> findMemberFileDetails(Long memberId, Long memberFileId) {
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
-//        MemberFile memberFile = memberFileRepository.findMemberFileByIdWithLogs(fileId)
-//                .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
-//        // TODO validation을 해야하는지 생각해보기
-//        validationFileOwner(member, memberFile);
-
-        MemberFile memberFile = memberFileRepository.findByIdAuth(memberId, memberFileId)
+    public MemberFile findByIdContainLogs(Long memberId, Long memberFileId) {
+        memberFileRepository.findByIdAuth(memberId, memberFileId)
                 .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
-
-        return memberFile.getMemberFileLogs();
+        return memberFileRepository.findByIdContainLogs(memberFileId)
+                .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
     }
 
     @Override
@@ -103,7 +99,6 @@ public class MemberFileServiceImpl implements MemberFileService {
 
         return result;
     }
-
 
 
     private void hasProject(MemberFile memberFile) {

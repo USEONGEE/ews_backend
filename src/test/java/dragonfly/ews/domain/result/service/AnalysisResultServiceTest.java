@@ -2,30 +2,26 @@ package dragonfly.ews.domain.result.service;
 
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
-import dragonfly.ews.domain.file.service.MemberFileService;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.domain.MemberRole;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
-import dragonfly.ews.domain.result.domain.FileAnalysisResult;
-import dragonfly.ews.domain.result.repository.FileAnalysisResultRepository;
+import dragonfly.ews.domain.result.domain.AnalysisResult;
+import dragonfly.ews.domain.result.repository.AnalysisResultRepository;
 import jakarta.persistence.EntityManager;
 import jdk.jfr.Description;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -33,27 +29,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-class FileAnalysisResultServiceTest {
+class AnalysisResultServiceTest {
     @Value("${file.test.dir}")
     String fileDir;
     @Autowired
     MemberFileLogRepository memberFileLogRepository;
     @Autowired
-    FileAnalysisResultRepository fileAnalysisResultRepository;
+    AnalysisResultRepository analysisResultRepository;
     @Autowired
     AnalysisResultProcessor analysisResultProcessor;
     @Autowired
@@ -73,8 +67,8 @@ class FileAnalysisResultServiceTest {
 
     /**
      * [흐름]
-     * <br/> 1.FileAnalysisResultServiceImpl.createFileAnalysisResult() 호출
-     * <br/> 2.FileAnalysisResultServiceImpl.analysis() 호출
+     * <br/> 1.AnalysisResultServiceImpl.createAnalysisResult() 호출
+     * <br/> 2.AnalysisResultServiceImpl.analysis() 호출
      * <br/> 3.AnalysisResultProcessor.processResult() 완료 이전 상태 조회
      * <br/> 4.AnalysisResultProcessor.processResult() 완료 이후 상태 조회
      * <p/> [특이사항]
@@ -104,7 +98,7 @@ class FileAnalysisResultServiceTest {
         Member member = null;
         MemberFile memberFile = null;
         MemberFileLog memberFileLog = null;
-        FileAnalysisResult fileAnalysisResult = null;
+        AnalysisResult analysisResult = null;
         // when
 
         TransactionDefinition def = new DefaultTransactionDefinition();
@@ -114,8 +108,8 @@ class FileAnalysisResultServiceTest {
             member = createMember();
             memberFile = createMemberFile(member);
             memberFileLog = memberFile.getMemberFileLogs().get(0);
-            fileAnalysisResult = new FileAnalysisResult(memberFileLog, AnalysisStatus.PROCESSING);
-            fileAnalysisResultRepository.save(fileAnalysisResult);
+            analysisResult = new AnalysisResult(memberFileLog, AnalysisStatus.PROCESSING);
+            analysisResultRepository.save(analysisResult);
             em.flush();
             transactionManager.commit(status);
         } catch (Exception e) {
@@ -128,7 +122,7 @@ class FileAnalysisResultServiceTest {
         MultiValueMap<String, HttpEntity<?>> multipartBody = multipartBodyBuilder.build();
 
         String analysisUri = "http://localhost:8080/calculate";
-        FileAnalysisResult finalFileAnalysisResult = fileAnalysisResult;
+        AnalysisResult finalAnalysisResult = analysisResult;
 
         System.out.println("=====WebClint 요청 보냄=====");
         webClient.post()
@@ -137,18 +131,18 @@ class FileAnalysisResultServiceTest {
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(result ->
-                        analysisResultProcessor.processResult((String) result, (Long) finalFileAnalysisResult.getId()));
+                        analysisResultProcessor.processResult((String) result, (Long) finalAnalysisResult.getId()));
         // then
-        FileAnalysisResult findResult
-                = fileAnalysisResultRepository.findById(fileAnalysisResult.getId()).get();
+        AnalysisResult findResult
+                = analysisResultRepository.findById(analysisResult.getId()).get();
         assertThat(findResult.getAnalysisStatus()).isEqualTo(AnalysisStatus.PROCESSING);
         Thread.sleep(5000);
         em.clear();
 
         System.out.println("=====WebClint 이후 검증 시작=====");
-        FileAnalysisResult secondFind
-                = fileAnalysisResultRepository.findById(fileAnalysisResult.getId()).get();
-        assertThat(secondFind.getAnalysisStatus()).isEqualTo(AnalysisStatus.COMPLETE);
+        AnalysisResult secondFind
+                = analysisResultRepository.findById(analysisResult.getId()).get();
+        assertThat(secondFind.getAnalysisStatus()).isEqualTo(AnalysisStatus.COMPLETED);
     }
 
     Member createMember() {

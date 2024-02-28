@@ -7,10 +7,10 @@ import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.domain.MemberRole;
 import dragonfly.ews.domain.member.repository.MemberRepository;
-import dragonfly.ews.domain.project.controlelr.ProjectCreateDto;
+import dragonfly.ews.domain.project.dto.ProjectCreateDto;
 import dragonfly.ews.domain.project.domain.Project;
-import dragonfly.ews.domain.project.repository.ProjectRepository;
 import dragonfly.ews.domain.project.service.ProjectService;
+import jakarta.persistence.EntityManager;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,14 +47,17 @@ class MemberFileServiceTest {
     FileUtils fileUtils;
     @Mock
     MultipartFile multipartFile;
+    @Autowired
+    EntityManager em;
 
 
     @Test
     void saveFile_success() {
         when(multipartFile.getOriginalFilename()).thenReturn("file.txt");
         Member member = createMember("s@gmail.com");
+        memberFileService.saveFile(multipartFile, member.getId());
+        MemberFile memberFile = member.getMemberFiles().get(0);
 
-        MemberFile memberFile = memberFileService.saveFile(multipartFile, member.getId());
         MemberFileLog memberFileLog = memberFile.getMemberFileLogs().get(0);
 
         assertThat(memberFile).isNotNull();
@@ -96,8 +99,8 @@ class MemberFileServiceTest {
     void updateFile_success() {
         when(multipartFile.getOriginalFilename()).thenReturn("file.txt");
         Member member = createMember("s@gmail.com");
-
-        MemberFile memberFile = memberFileService.saveFile(multipartFile, member.getId());
+        memberFileService.saveFile(multipartFile, member.getId());
+        MemberFile memberFile = member.getMemberFiles().get(0);
         addMemberFileToProject(member, memberFile);
 
         memberFileService.updateFile(multipartFile, member.getId(), memberFile.getId());
@@ -111,7 +114,8 @@ class MemberFileServiceTest {
         when(multipartFile.getOriginalFilename()).thenReturn("file.txt");
         Member member = createMember("s@gmail.com");
 
-        MemberFile memberFile = memberFileService.saveFile(multipartFile, member.getId());
+        memberFileService.saveFile(multipartFile, member.getId());
+        MemberFile memberFile = member.getMemberFiles().get(0);
 
         assertThatThrownBy(() -> memberFileService.updateFile(multipartFile, member.getId(), memberFile.getId()))
                 .isInstanceOf(FileNotInProjectException.class);
@@ -124,9 +128,12 @@ class MemberFileServiceTest {
         Member member = createMember("s@gmail.com");
         Member anotherMember = createMember("ss@gmail.com");
 
-        MemberFile memberFile = memberFileService.saveFile(multipartFile, member.getId());
+        memberFileService.saveFile(multipartFile, member.getId());
+        MemberFile memberFile = member.getMemberFiles().get(0);
         addMemberFileToProject(member, memberFile);
-        MemberFile anotherFile = memberFileService.saveFile(multipartFile, anotherMember.getId());
+        memberFileService.saveFile(multipartFile, anotherMember.getId());
+
+        MemberFile anotherFile = anotherMember.getMemberFiles().get(0);
 
         assertThatThrownBy(() -> memberFileService.updateFile(multipartFile, member.getId(), anotherFile.getId()))
                 .isInstanceOf(NoSuchFileException.class);
@@ -138,13 +145,14 @@ class MemberFileServiceTest {
                 .thenReturn("file.txt")
                 .thenReturn("file2.txt");
         Member member = createMember("s@gmail.com");
-        MemberFile memberFile = memberFileService.saveFile(multipartFile, member.getId());
+        memberFileService.saveFile(multipartFile, member.getId());
+        MemberFile memberFile = member.getMemberFiles().get(0);
         addMemberFileToProject(member, memberFile);
         memberFileService.updateFile(multipartFile, member.getId(), memberFile.getId());
 
-        List<MemberFileLog> memberFileDetails = memberFileService.findMemberFileDetails(member.getId(), memberFile.getId());
+        MemberFile findMemberFile = memberFileService.findByIdContainLogs(member.getId(), memberFile.getId());
 
-        assertThat(memberFileDetails.size()).isEqualTo(2);
+        assertThat(findMemberFile.getMemberFileLogs().size()).isEqualTo(2);
     }
 
     @DisplayName("자신의 파일이 아닌 것을 조회하려고하면 예외발생")
@@ -154,12 +162,13 @@ class MemberFileServiceTest {
                 .thenReturn("file.txt")
                 .thenReturn("file2.txt");
         Member member = createMember("s@gmail.com");
-        MemberFile memberFile = memberFileService.saveFile(multipartFile, member.getId());
+        memberFileService.saveFile(multipartFile, member.getId());
+        MemberFile memberFile = member.getMemberFiles().get(0);
         addMemberFileToProject(member, memberFile);
         memberFileService.updateFile(multipartFile, member.getId(), memberFile.getId());
 
         Member anotherMember = createMember("ss@gmail.com");
-        assertThatThrownBy(() -> memberFileService.findMemberFileDetails(anotherMember.getId(), memberFile.getId()))
+        assertThatThrownBy(() -> memberFileService.findByIdContainLogs(anotherMember.getId(), memberFile.getId()))
                 .isInstanceOf(NoSuchFileException.class);
     }
 
@@ -178,6 +187,11 @@ class MemberFileServiceTest {
     Project createProject(Long ownerId) {
         ProjectCreateDto projectCreateDto = new ProjectCreateDto("project");
         return projectService.createProject(ownerId, projectCreateDto);
+    }
+
+    @Test
+    void test() {
+        System.out.println("memberFileService = " + memberFileService.getClass());
     }
 
 }

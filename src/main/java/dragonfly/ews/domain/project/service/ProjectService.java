@@ -1,7 +1,7 @@
 package dragonfly.ews.domain.project.service;
 
-import dragonfly.ews.domain.project.controlelr.ParticipantDto;
-import dragonfly.ews.domain.project.controlelr.ProjectCreateDto;
+import dragonfly.ews.domain.project.dto.ParticipantDto;
+import dragonfly.ews.domain.project.dto.ProjectCreateDto;
 import dragonfly.ews.domain.project.domain.Project;
 
 public interface ProjectService {

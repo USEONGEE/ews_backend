@@ -8,7 +8,7 @@ import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.domain.MemberRole;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
-import dragonfly.ews.domain.result.domain.FileAnalysisResult;
+import dragonfly.ews.domain.result.domain.AnalysisResult;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,9 +23,9 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class FileAnalysisResultRepositoryTest {
+class AnalysisResultRepositoryTest {
     @Autowired
-    FileAnalysisResultRepository fileAnalysisResultRepository;
+    AnalysisResultRepository analysisResultRepository;
     @Autowired
     MemberFileRepository memberFileRepository;
     @Autowired
@@ -43,13 +43,13 @@ class FileAnalysisResultRepositoryTest {
         Member member = createMember("shdbtjd9@naver.com");
         MemberFile memberFile = createMemberFile(member);
         MemberFileLog memberFileLog = memberFile.getMemberFileLogs().get(0);
-        FileAnalysisResult fileAnalysisResult = createFileAnalysisResult(memberFileLog);
+        AnalysisResult analysisResult = createAnalysisResult(memberFileLog);
 
         em.flush();
         em.clear();
 
-        FileAnalysisResult findResult = fileAnalysisResultRepository.findResultFileByIdAuth(member.getId(),
-                fileAnalysisResult.getId()).orElse(null);
+        AnalysisResult findResult = analysisResultRepository.findResultFileByIdAuth(member.getId(),
+                analysisResult.getId()).orElse(null);
         assertThat(findResult).isNotNull();
     }
 
@@ -59,7 +59,7 @@ class FileAnalysisResultRepositoryTest {
         Member member = createMember("shdbtjd9@naver.com");
         MemberFile memberFile = createMemberFile(member);
         MemberFileLog memberFileLog = memberFile.getMemberFileLogs().get(0);
-        FileAnalysisResult fileAnalysisResult = createFileAnalysisResult(memberFileLog);
+        AnalysisResult analysisResult = createAnalysisResult(memberFileLog);
 
         Member anotherMember = createMember("ss@naver.com");
         memberRepository.save(anotherMember);
@@ -67,8 +67,8 @@ class FileAnalysisResultRepositoryTest {
         em.flush();
         em.clear();
 
-        FileAnalysisResult findResult = fileAnalysisResultRepository.findResultFileByIdAuth(anotherMember.getId(),
-                fileAnalysisResult.getId()).orElse(null);
+        AnalysisResult findResult = analysisResultRepository.findResultFileByIdAuth(anotherMember.getId(),
+                analysisResult.getId()).orElse(null);
 
         assertThat(findResult).isNull();
     }
@@ -79,19 +79,19 @@ class FileAnalysisResultRepositoryTest {
         Member member = createMember("shdbtjd9@naver.com");
         MemberFile memberFile = createMemberFile(member);
         MemberFileLog memberFileLog = memberFile.getMemberFileLogs().get(0);
-        FileAnalysisResult result1 = createFileAnalysisResult(memberFileLog);
-        FileAnalysisResult result2 = createFileAnalysisResult(memberFileLog);
+        AnalysisResult result1 = createAnalysisResult(memberFileLog);
+        AnalysisResult result2 = createAnalysisResult(memberFileLog);
 
         em.flush();
         em.clear();
 
-        FileAnalysisResult findResult1 = fileAnalysisResultRepository.findById(result1.getId())
+        AnalysisResult findResult1 = analysisResultRepository.findById(result1.getId())
                 .orElse(null);
-        FileAnalysisResult findResult2 = fileAnalysisResultRepository.findById(result2.getId())
+        AnalysisResult findResult2 = analysisResultRepository.findById(result2.getId())
                 .orElse(null);
         MemberFileLog findMemberFileLog = memberFileLogRepository.findById(memberFileLog.getId())
                 .orElse(null);
-        List<FileAnalysisResult> resultFileByFileLogId = fileAnalysisResultRepository
+        List<AnalysisResult> resultFileByFileLogId = analysisResultRepository
                 .findResultFileByFileLogId(findMemberFileLog.getId());
 
         assertThat(resultFileByFileLogId)
@@ -109,9 +109,9 @@ class FileAnalysisResultRepositoryTest {
         return memberFileRepository.save(memberFile);
     }
 
-    FileAnalysisResult createFileAnalysisResult(MemberFileLog memberFileLog) {
-        FileAnalysisResult fileAnalysisResult = new FileAnalysisResult(memberFileLog, AnalysisStatus.PROCESSING);
-        return fileAnalysisResultRepository.save(fileAnalysisResult);
+    AnalysisResult createAnalysisResult(MemberFileLog memberFileLog) {
+        AnalysisResult analysisResult = new AnalysisResult(memberFileLog, AnalysisStatus.PROCESSING);
+        return analysisResultRepository.save(analysisResult);
     }
 
 }

@@ -7,7 +7,7 @@ import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.domain.MemberRole;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.project.repository.ProjectRepository;
-import dragonfly.ews.domain.result.repository.FileAnalysisResultRepository;
+import dragonfly.ews.domain.result.repository.AnalysisResultRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class FileAnalysisResultTest {
+class AnalysisResultTest {
     @Autowired
-    FileAnalysisResultRepository fileAnalysisResultRepository;
+    AnalysisResultRepository analysisResultRepository;
     @Autowired
     MemberFileLogRepository memberFileLogRepository;
     @Autowired
@@ -39,13 +39,13 @@ class FileAnalysisResultTest {
     void create() {
         Member member = createMember();
         MemberFile memberFile = createMemberFile(member);
-        FileAnalysisResult fileAnalysisResult = new FileAnalysisResult(memberFile.getMemberFileLogs().get(0), AnalysisStatus.PROCESSING);
-        fileAnalysisResultRepository.save(fileAnalysisResult);
+        AnalysisResult analysisResult = new AnalysisResult(memberFile.getMemberFileLogs().get(0), AnalysisStatus.PROCESSING);
+        analysisResultRepository.save(analysisResult);
 
         em.flush();
         em.clear();
 
-        FileAnalysisResult findResult = fileAnalysisResultRepository.findById(fileAnalysisResult.getId()).get();
+        AnalysisResult findResult = analysisResultRepository.findById(analysisResult.getId()).get();
         MemberFile findMemberFile = memberFileRepository.findById(memberFile.getId()).get();
         Member findMember = memberRepository.findById(member.getId()).get();
 
