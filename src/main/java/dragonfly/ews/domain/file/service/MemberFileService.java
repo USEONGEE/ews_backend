@@ -1,6 +1,8 @@
 package dragonfly.ews.domain.file.service;
 
 import dragonfly.ews.domain.file.domain.MemberFile;
+import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
+import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,7 +17,10 @@ public interface MemberFileService {
      * @param file
      * @param memberId
      */
+    @Deprecated
     boolean saveFile(MultipartFile file, Long memberId);
+
+    boolean saveFile(Long memberId, MemberFileCreateDto memberFileCreateDto);
 
     /**
      * []
@@ -24,7 +29,10 @@ public interface MemberFileService {
      * @param fileId
      */
 
+    @Deprecated
     boolean updateFile(MultipartFile file, Long memberId, Long fileId);
+
+    boolean updateFile(Long memberId, MemberFileUpdateDto memberFileUpdateDto);
 
     MemberFile findByIdContainLogs(Long memberId, Long memberFileId);
 

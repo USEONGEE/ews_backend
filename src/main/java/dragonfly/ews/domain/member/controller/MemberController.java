@@ -8,11 +8,11 @@ import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +23,6 @@ public class MemberController {
 
     /**
      * [회원 가입]
-     *
      * @param memberSignUpDto
      * @exception RuntimeException 회원 가입에 실패했을 시
      */
@@ -31,6 +30,20 @@ public class MemberController {
     public ResponseEntity<SuccessResponse> signUp(@RequestBody MemberSignUpDto memberSignUpDto) {
         memberService.signUp(memberSignUpDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
+     * [프로필 이미지 변경]
+     * @param member
+     * @param multipartFile
+     * @return
+     */
+    @PostMapping("/profile/image")
+    public ResponseEntity<SuccessResponse> changeProfileImage(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @RequestBody MultipartFile multipartFile) {
+        memberService.changeProfileImage(member.getId(), multipartFile);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @VisibleForTesting

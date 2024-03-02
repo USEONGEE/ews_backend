@@ -7,5 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class ProjectCreateDto {
     private String projectName;
+    private String description;
 
 }

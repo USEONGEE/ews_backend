@@ -3,6 +3,7 @@ package dragonfly.ews.domain.file.domain;
 import dragonfly.ews.domain.base.BaseEntity;
 import dragonfly.ews.domain.file.exception.ExtensionNotFoundException;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
+import dragonfly.ews.domain.filelog.dto.MemberFileLogCreateDto;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;
 import jakarta.persistence.*;
@@ -45,6 +46,8 @@ public class MemberFile extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "memberFile")
     private List<MemberFileLog> memberFileLogs = new ArrayList<>();
+    @Lob
+    private String description;
 
     public MemberFile(@NotNull Member owner, @NotNull String originalFilename, @NotNull String savedFilename) {
         this.fileName = originalFilename;
@@ -90,11 +93,21 @@ public class MemberFile extends BaseEntity {
     // ==편의 메소드==
     /**
      * [파일 업데이트 및 로그 엔티티 생성]
+     * <br/> MemberFileLog 를 생성할 때 DTO를 사용하지 않아서 제거
      * @param savedFilename
      */
+    @Deprecated
     public void updateFile(@NotNull String savedFilename) {
         validateSavedFilename(savedFilename);
         MemberFileLog memberFileLog = new MemberFileLog(this, savedFilename);
+        getMemberFileLogs().add(memberFileLog);
+    }
+
+    public void updateFile(MemberFileLogCreateDto memberFileLogCreateDto) {
+        String savedFileName = memberFileLogCreateDto.getSavedFileName();
+        validateSavedFilename(savedFileName);
+        MemberFileLog memberFileLog = new MemberFileLog(this, savedFileName);
+        memberFileLog.changeDescription(memberFileLogCreateDto.getDescription());
         getMemberFileLogs().add(memberFileLog);
     }
 
@@ -105,6 +118,10 @@ public class MemberFile extends BaseEntity {
         }
         setProject(project);
         project.getMemberFiles().add(this);
+    }
+
+    public void changeDescription(String description) {
+        setDescription(description);
     }
 
 }

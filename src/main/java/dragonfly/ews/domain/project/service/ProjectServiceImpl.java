@@ -14,6 +14,8 @@ import dragonfly.ews.domain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
@@ -21,6 +23,12 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final MemberFileRepository memberFileRepository;
 
+    /**
+     * [프로젝트 생성]
+     * @param ownerId
+     * @param projectCreateDto
+     * @return
+     */
     @Override
     public Project createProject(Long ownerId, ProjectCreateDto projectCreateDto) {
         Member member = memberRepository.findById(ownerId)
@@ -31,6 +39,13 @@ public class ProjectServiceImpl implements ProjectService {
         return project;
     }
 
+    /**
+     * [프로젝트 참여자 생성]
+     * @param ownerId
+     * @param projectId
+     * @param participantDtos
+     * @return
+     */
     @Override
     public Project addParticipants(Long ownerId, Long projectId, ParticipantDto... participantDtos) {
         Project project = projectRepository.findByIdAuth(ownerId, projectId)
@@ -45,6 +60,13 @@ public class ProjectServiceImpl implements ProjectService {
         return project;
     }
 
+    /**
+     * [프로젝트에 참여시킬 파일 추가]
+     * @param ownerId
+     * @param projectId
+     * @param memberFileIds
+     * @return
+     */
     @Override
     public Project addMemberFile(Long ownerId, Long projectId, Long... memberFileIds) {
         Project project = projectRepository.findByIdAuth(ownerId, projectId)
@@ -56,6 +78,17 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return project;
+    }
+
+    @Override
+    public List<Project> findAll(Long memberId) {
+        return projectRepository.findAll(memberId);
+    }
+
+    @Override
+    public Project findOne(Long memberId, Long projectId) {
+        return projectRepository.findByIdAndOwnerId(projectId, memberId)
+                .orElseThrow(NoSuchProjectException::new);
     }
 
 }

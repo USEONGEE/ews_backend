@@ -31,6 +31,7 @@ public class Member extends BaseTimeEntity {
     private String refreshToken;
     private String provider;
     private String providerId;
+    private String imageName;
 
     @Enumerated(value = EnumType.STRING)
     private MemberRole memberRole;
@@ -85,5 +86,9 @@ public class Member extends BaseTimeEntity {
     public void addProviderAndId(String provider, String providerId) {
         setProvider(provider);
         setProviderId(providerId);
+    }
+
+    public void changeImageName(String imageName) {
+        setImageName(imageName);
     }
 }

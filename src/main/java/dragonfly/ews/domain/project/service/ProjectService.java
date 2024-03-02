@@ -4,6 +4,8 @@ import dragonfly.ews.domain.project.dto.ParticipantDto;
 import dragonfly.ews.domain.project.dto.ProjectCreateDto;
 import dragonfly.ews.domain.project.domain.Project;
 
+import java.util.List;
+
 public interface ProjectService {
 
     /**
@@ -25,4 +27,9 @@ public interface ProjectService {
      * [프로젝트 파일 추가]
      */
     Project addMemberFile(Long ownerId, Long projectId, Long... memberFileIds);
+
+    List<Project> findAll(Long memberId);
+
+    Project findOne(Long memberId, Long projectId);
+
 }

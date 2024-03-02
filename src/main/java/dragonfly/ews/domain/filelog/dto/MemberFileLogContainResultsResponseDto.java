@@ -12,12 +12,14 @@ import java.util.List;
 @Data
 public class MemberFileLogContainResultsResponseDto {
     private Long id;
+    private String description;
     private LocalDateTime createdData;
     private List<AnalysisResultResponse> results = new ArrayList<>();
 
     public MemberFileLogContainResultsResponseDto(MemberFileLog memberFileLog) {
         this.id = memberFileLog.getId();
         this.createdData = memberFileLog.getCreatedDate();
+        this.description = memberFileLog.getDescription();
         for (AnalysisResult analysisResult : memberFileLog.getAnalysisResults()) {
             this.results.add(new AnalysisResultResponse(analysisResult));
         }

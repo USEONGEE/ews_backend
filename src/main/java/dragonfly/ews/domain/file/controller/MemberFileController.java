@@ -3,11 +3,12 @@ package dragonfly.ews.domain.file.controller;
 import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileContainLogsResponseDto;
+import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.file.dto.MemberFileResponseDto;
+import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
 import dragonfly.ews.domain.file.service.MemberFileService;
 import dragonfly.ews.domain.member.domain.Member;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,14 +26,14 @@ public class MemberFileController {
     /**
      * [파일 추가]
      *
-     * @param file
      * @param member
      * @return
      */
     @PostMapping
-    public ResponseEntity<SuccessResponse> addFile(@RequestParam(value = "file") MultipartFile file,
+    public ResponseEntity<SuccessResponse> addFile(@ModelAttribute MemberFileCreateDto memberFileCreateDto,
                                                    @AuthenticationPrincipal(expression = "member") Member member) {
-        return new ResponseEntity<>(SuccessResponse.of(memberFileService.saveFile(file, member.getId())),
+        return new ResponseEntity<>(SuccessResponse.of(memberFileService.saveFile(member.getId(),
+                memberFileCreateDto)),
                 HttpStatus.CREATED);
     }
 
@@ -40,17 +41,18 @@ public class MemberFileController {
      * [파일 업데이트]
      * <br/> 파일 로그 추가
      *
-     * @param file
      * @param memberFileId
      * @param member
      * @return
      */
     @PostMapping("/{memberFileId}")
-    public ResponseEntity<SuccessResponse> updateFile(@RequestParam(value = "file") MultipartFile file,
-                                                      @PathVariable(value = "memberFileId") Long memberFileId,
-                                                      @AuthenticationPrincipal(expression = "member") Member member) {
-        return new ResponseEntity<>(SuccessResponse.of(memberFileService.updateFile(file, member.getId(),
-                memberFileId)), HttpStatus.CREATED);
+    public ResponseEntity<SuccessResponse> updateFile(
+            @ModelAttribute MemberFileUpdateDto memberFileUpdateDto,
+            @PathVariable(value = "memberFileId") Long memberFileId,
+            @AuthenticationPrincipal(expression = "member") Member member) {
+        memberFileUpdateDto.setMemberFileId(memberFileId);
+        return new ResponseEntity<>(SuccessResponse.of(memberFileService.updateFile(member.getId(),
+                memberFileUpdateDto)), HttpStatus.OK);
     }
 
     /**
@@ -71,6 +73,7 @@ public class MemberFileController {
     /**
      * [파일 전체 조회]
      * <br/> 회원이 가지고 있는 논리 파일 전체 조회
+     *
      * @param member
      * @return
      */

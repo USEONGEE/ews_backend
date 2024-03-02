@@ -2,9 +2,12 @@ package dragonfly.ews.domain.file.service;
 
 import dragonfly.ews.domain.file.FileUtils;
 import dragonfly.ews.domain.file.domain.MemberFile;
+import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
+import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
 import dragonfly.ews.domain.file.exception.*;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
+import dragonfly.ews.domain.filelog.dto.MemberFileLogCreateDto;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.exception.NoSuchMemberException;
@@ -35,6 +38,8 @@ public class MemberFileServiceImpl implements MemberFileService {
      * @param file
      * @param memberId
      */
+
+    @Deprecated
     @Transactional
     @Override
     public boolean saveFile(MultipartFile file, Long memberId) {
@@ -54,6 +59,50 @@ public class MemberFileServiceImpl implements MemberFileService {
         return true;
     }
 
+    @Transactional
+    @Override
+    public boolean saveFile(Long memberId, MemberFileCreateDto memberFileCreateDto) {
+        MultipartFile file = memberFileCreateDto.getFile();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
+
+        // 파일 이름 가져오고 저장할 파일이름 만들기
+        String originalFilename = memberFileCreateDto.getFileName();
+        hasName(originalFilename);
+        String savedFilename = memberFileUtils.createSavedFilename(originalFilename);
+
+        // MemberFile 저장하기
+        MemberFile memberFile = new MemberFile(member, originalFilename, savedFilename);
+        memberFile.changeDescription(memberFileCreateDto.getDescription());
+        memberFileRepository.save(memberFile);
+        
+        // 파일 저장하기
+        memberFileUtils.storeFile(file, savedFilename);
+
+
+        return true;
+    }
+
+
+    @Override
+    @Transactional
+    public boolean updateFile(Long memberId, MemberFileUpdateDto memberFileUpdateDto) {
+        MemberFile memberFile = memberFileRepository.findByIdAuth(memberId, memberFileUpdateDto.getMemberFileId())
+                .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
+        // 검증
+        hasProject(memberFile);
+        // 저장될 파일명 생성
+        String savedFilename = memberFileUtils.createSavedFilename(memberFile.getFileName());
+        // MemberFileLog 생성 및 저장
+        MemberFileLogCreateDto memberFileLogCreateDto =
+                MemberFileLogCreateDto.of(savedFilename, memberFileUpdateDto.getDescription());
+        memberFile.updateFile(memberFileLogCreateDto);
+        // 파일 저장
+        memberFileUtils.storeFile(memberFileUpdateDto.getFile(), savedFilename);
+
+        return true;
+    }
+
     /**
      * [맴버가 가지고 있는 파일 업데이트]
      *
@@ -61,14 +110,10 @@ public class MemberFileServiceImpl implements MemberFileService {
      * @param memberId
      * @param fileId
      */
+    @Deprecated
     @Transactional
     @Override
     public boolean updateFile(MultipartFile file, Long memberId, Long fileId) {
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
-//        MemberFile memberFile = memberFileRepository.findById(fileId)
-//                .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
-//        validationFileOwner(member, memberFile);
         MemberFile memberFile = memberFileRepository.findByIdAuth(memberId, fileId)
                 .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
 

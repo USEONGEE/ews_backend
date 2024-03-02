@@ -173,7 +173,7 @@ class MemberFileServiceTest {
     }
 
     void addMemberFileToProject(Member member, MemberFile memberFile) {
-        ProjectCreateDto projectCreateDto = new ProjectCreateDto("project");
+        ProjectCreateDto projectCreateDto = new ProjectCreateDto("project", null);
         Project project = projectService.createProject(member.getId(), projectCreateDto);
         projectService.addMemberFile(member.getId(), project.getId(), memberFile.getId());
     }
@@ -185,7 +185,7 @@ class MemberFileServiceTest {
     }
 
     Project createProject(Long ownerId) {
-        ProjectCreateDto projectCreateDto = new ProjectCreateDto("project");
+        ProjectCreateDto projectCreateDto = new ProjectCreateDto("project", null);
         return projectService.createProject(ownerId, projectCreateDto);
     }
 

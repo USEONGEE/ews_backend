@@ -23,13 +23,20 @@ public class MemberFileLog extends BaseEntity {
     @JoinColumn(name = "file_id", nullable = false)
     private MemberFile memberFile;
     private String savedName;
+    @Lob
+    private String description;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "memberFileLog")
     private List<AnalysisResult> analysisResults = new ArrayList<>();
 
+
     public MemberFileLog(MemberFile memberFile, String savedName) {
         this.memberFile = memberFile;
         this.savedName = savedName;
+    }
+
+    public void changeDescription(String description) {
+        setDescription(description);
     }
 
 }

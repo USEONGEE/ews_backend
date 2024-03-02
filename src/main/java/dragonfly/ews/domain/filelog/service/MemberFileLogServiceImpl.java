@@ -5,7 +5,11 @@ import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +29,10 @@ public class MemberFileLogServiceImpl implements MemberFileLogService {
                 .orElseThrow(() -> new NoSuchFileException("파일이 존재하지 않습니다."));
         return memberFileLogRepository.findByIdContainResult(memberFileLogId)
                 .orElseThrow(() -> new NoSuchFileException("파일이 존재하지 않습니다."));
+    }
+
+    @Override
+    public Page<MemberFileLog> findPaging(Long memberId, Pageable pageable) {
+        return memberFileLogRepository.findByOwnerId(memberId, pageable);
     }
 }
