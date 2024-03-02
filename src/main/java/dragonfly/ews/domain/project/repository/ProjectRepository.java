@@ -14,9 +14,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("select p from Project p where p.id = :projectId and p.owner.id = :ownerId")
     Optional<Project> findByIdAuth(@Param("ownerId") Long ownerId, @Param("projectId") Long projectId);
 
-    @Query("select p from Project p join fetch p.memberFiles where p.owner.id = :ownerId")
+    @Query("select p from Project p where p.owner.id = :ownerId")
     List<Project> findAll(@Param("ownerId") Long ownerId);
 
-    @Query("select p from Project p join fetch p.memberFiles where p.id = :projectId and p.owner.id = :ownerId")
+    @Query("select p from Project p join fetch p.memberFiles mf where p.id = :projectId and p.owner.id = :ownerId")
     Optional<Project> findByIdAndOwnerId(@Param("projectId") Long projectId, @Param("ownerId") Long ownerId);
 }

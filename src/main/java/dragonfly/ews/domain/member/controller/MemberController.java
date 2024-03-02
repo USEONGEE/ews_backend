@@ -3,7 +3,7 @@ package dragonfly.ews.domain.member.controller;
 import com.google.common.annotations.VisibleForTesting;
 import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
-import dragonfly.ews.domain.member.domain.MemberSignUpDto;
+import dragonfly.ews.domain.member.dto.MemberSignUpDto;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;

@@ -3,7 +3,7 @@ package dragonfly.ews.domain.member.service;
 import dragonfly.ews.domain.file.FileUtils;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.domain.MemberRole;
-import dragonfly.ews.domain.member.domain.MemberSignUpDto;
+import dragonfly.ews.domain.member.dto.MemberSignUpDto;
 import dragonfly.ews.domain.member.exception.NoSuchMemberException;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 
 @Service
 @RequiredArgsConstructor

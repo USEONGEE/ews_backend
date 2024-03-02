@@ -4,12 +4,13 @@ import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Data@NoArgsConstructor
 public class MemberFileLogContainResultsResponseDto {
     private Long id;
     private String description;
@@ -25,7 +26,7 @@ public class MemberFileLogContainResultsResponseDto {
         }
     }
 
-    @Data
+    @Data@NoArgsConstructor
 
     private static class AnalysisResultResponse {
         private Long id;

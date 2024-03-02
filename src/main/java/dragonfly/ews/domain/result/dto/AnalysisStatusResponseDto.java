@@ -3,8 +3,9 @@ package dragonfly.ews.domain.result.dto;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
+@Data @NoArgsConstructor
 public class AnalysisStatusResponseDto {
     private Long id;
     private AnalysisStatus analysisStatus;

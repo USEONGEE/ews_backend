@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.member.domain;
+package dragonfly.ews.domain.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;

@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.project.controlelr;
+package dragonfly.ews.domain.project.controller;
 
 import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
@@ -20,14 +20,25 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
 
+    /**
+     * [프로젝트 생성]
+     * @param projectCreateDto
+     * @param member
+     * @return
+     */
     @PostMapping
-    public ResponseEntity<SuccessResponse> createPost(
+    public ResponseEntity<SuccessResponse> createProject(
             @RequestBody ProjectCreateDto projectCreateDto,
             @AuthenticationPrincipal(expression = "member") Member member) {
         projectService.createProject(member.getId(), projectCreateDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    /**
+     *
+     * @param member
+     * @return
+     */
     @GetMapping("/all")
     public ResponseEntity<SuccessResponse> findAll(
             @AuthenticationPrincipal(expression = "member") Member member) {

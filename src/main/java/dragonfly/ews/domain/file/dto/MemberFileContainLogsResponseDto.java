@@ -3,12 +3,14 @@ package dragonfly.ews.domain.file.dto;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class MemberFileContainLogsResponseDto {
     private Long id;
     private String fileName;
@@ -27,6 +29,7 @@ public class MemberFileContainLogsResponseDto {
     }
 
     @Data
+    @NoArgsConstructor
     private static class MemberFileLogResponseDto {
         private Long id;
         private LocalDateTime createdDate;

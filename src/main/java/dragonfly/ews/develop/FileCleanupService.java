@@ -15,7 +15,7 @@ import java.nio.file.Paths;
  *
  * 어플리케이션 종료 시점에 디렉토리의 파일을 전부 삭제한다.
  */
-@Component
+//@Component
 public class FileCleanupService {
 
     @Value("${file.dir}")

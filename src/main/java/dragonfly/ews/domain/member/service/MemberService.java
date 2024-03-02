@@ -1,6 +1,6 @@
 package dragonfly.ews.domain.member.service;
 
-import dragonfly.ews.domain.member.domain.MemberSignUpDto;
+import dragonfly.ews.domain.member.dto.MemberSignUpDto;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface MemberService {
