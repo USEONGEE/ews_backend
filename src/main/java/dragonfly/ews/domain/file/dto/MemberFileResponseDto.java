@@ -12,6 +12,7 @@ public class MemberFileResponseDto {
     private Long id;
     private String fileName;
     private String fileType;
+    private String description;
     private LocalDateTime createdDate;
 
     public MemberFileResponseDto(MemberFile memberFile) {
@@ -19,5 +20,6 @@ public class MemberFileResponseDto {
         this.fileName = memberFile.getFileName();
         this.fileType = memberFile.getFileType();
         this.createdDate = memberFile.getCreatedDate();
+        this.description = memberFile.getDescription();
     }
 }

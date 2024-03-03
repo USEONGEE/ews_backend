@@ -6,13 +6,13 @@ import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
 import dragonfly.ews.domain.file.exception.*;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
-import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.dto.MemberFileLogCreateDto;
-import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.exception.NoSuchMemberException;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.project.domain.Project;
+import dragonfly.ews.domain.project.exception.NoSuchProjectException;
+import dragonfly.ews.domain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,8 +29,8 @@ public class MemberFileServiceImpl implements MemberFileService {
 
     private final MemberFileRepository memberFileRepository;
     private final MemberRepository memberRepository;
-    private final MemberFileLogRepository memberFileLogRepository;
     private final FileUtils memberFileUtils;
+    private final ProjectRepository projectRepository;
 
     /**
      * [파일 저장]
@@ -65,17 +65,20 @@ public class MemberFileServiceImpl implements MemberFileService {
         MultipartFile file = memberFileCreateDto.getFile();
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
+        Project project = projectRepository.findById(memberFileCreateDto.getProjectId())
+                .orElseThrow(NoSuchProjectException::new);
 
         // 파일 이름 가져오고 저장할 파일이름 만들기
-        String originalFilename = memberFileCreateDto.getFileName();
+        String originalFilename = memberFileCreateDto.getFile().getOriginalFilename();
         hasName(originalFilename);
         String savedFilename = memberFileUtils.createSavedFilename(originalFilename);
 
         // MemberFile 저장하기
-        MemberFile memberFile = new MemberFile(member, originalFilename, savedFilename);
+        MemberFile memberFile = new MemberFile(member, memberFileCreateDto.getFileName(), originalFilename, savedFilename);
+        memberFile.changeProject(project);
         memberFile.changeDescription(memberFileCreateDto.getDescription());
         memberFileRepository.save(memberFile);
-        
+
         // 파일 저장하기
         memberFileUtils.storeFile(file, savedFilename);
 

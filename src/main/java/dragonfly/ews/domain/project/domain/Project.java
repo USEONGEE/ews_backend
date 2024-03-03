@@ -4,7 +4,6 @@ import dragonfly.ews.domain.base.BaseEntity;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.dto.ProjectCreateDto;
-import dragonfly.ews.domain.project.exception.CannotChangeProjectOwnerException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -61,7 +60,7 @@ public class Project extends BaseEntity {
     }
 
     public void addMemberFile(@NotNull MemberFile memberFile) {
-        memberFile.addProject(this);
+        memberFile.changeProject(this);
         getMemberFiles().add(memberFile);
 
     }

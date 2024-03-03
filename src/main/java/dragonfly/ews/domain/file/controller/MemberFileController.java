@@ -32,6 +32,7 @@ public class MemberFileController {
     @PostMapping
     public ResponseEntity<SuccessResponse> addFile(@ModelAttribute MemberFileCreateDto memberFileCreateDto,
                                                    @AuthenticationPrincipal(expression = "member") Member member) {
+        System.out.println("memberFileCreateDto = " + memberFileCreateDto.toString());
         return new ResponseEntity<>(SuccessResponse.of(memberFileService.saveFile(member.getId(),
                 memberFileCreateDto)),
                 HttpStatus.CREATED);

@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 맴버가 소유한 파일
@@ -49,6 +48,17 @@ public class MemberFile extends BaseEntity {
     @Lob
     private String description;
 
+    public MemberFile(@NotNull Member owner, @NotNull String submittedFileName,
+                      @NotNull String originalFilename, @NotNull String savedFilename) {
+        this.fileName = submittedFileName;
+        this.fileType = getFileExt(originalFilename);
+        this.owner = owner;
+        getOwner().getMemberFiles().add(this);
+
+        validateSavedFilename(savedFilename);
+        updateFile(savedFilename);
+    }
+
     public MemberFile(@NotNull Member owner, @NotNull String originalFilename, @NotNull String savedFilename) {
         this.fileName = originalFilename;
         this.fileType = getFileExt(originalFilename);
@@ -62,9 +72,10 @@ public class MemberFile extends BaseEntity {
     /**
      * [파일 확장자 얻어내기]
      * <p/> 파일에 확장자가 존재하지 않으면 예외 발생
+     *
      * @param fileName
      * @return
-     * @exception dragonfly.ews.domain.file.exception.ExtensionNotFoundException
+     * @throws dragonfly.ews.domain.file.exception.ExtensionNotFoundException
      */
     private String getFileExt(String fileName) {
         int lastDotIndex = fileName.lastIndexOf(".");
@@ -80,8 +91,8 @@ public class MemberFile extends BaseEntity {
      * 파일의 확장자가 기존의 확장자와 같은지, 파일에 확장자가 존재하는 지 확인.
      * <br/> 파일이 업데이트 및 저장되기 전에 확인되어야 한다.
      * <br/> 파일의 확장자가 기존과 동일하지 않으면 예외 발생.
-     * 
-     * @exception dragonfly.ews.domain.file.exception.ExtensionNotEqualException
+     *
+     * @throws dragonfly.ews.domain.file.exception.ExtensionNotEqualException
      */
     private void validateSavedFilename(String savedFilename) {
         String ext = getFileExt(savedFilename);
@@ -91,9 +102,11 @@ public class MemberFile extends BaseEntity {
     }
 
     // ==편의 메소드==
+
     /**
      * [파일 업데이트 및 로그 엔티티 생성]
      * <br/> MemberFileLog 를 생성할 때 DTO를 사용하지 않아서 제거
+     *
      * @param savedFilename
      */
     @Deprecated
@@ -111,7 +124,7 @@ public class MemberFile extends BaseEntity {
         getMemberFileLogs().add(memberFileLog);
     }
 
-    public void addProject(@NotNull Project project) {
+    public void changeProject(@NotNull Project project) {
         if (getProject() != null) {
             getProject().getMemberFiles().remove(this);
             log.info("[MemberFile] 프로젝트와의 연관관계가 제거되었습니다.");

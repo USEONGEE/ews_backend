@@ -41,7 +41,7 @@ jwt:
     header: Authorization-refresh
 
 file:
-  dir: D:/dragonfly/ews/file/
+  dir: D:/dragonfly/ews/ews_backend/file/
 
 analysis:
   server:

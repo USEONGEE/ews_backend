@@ -32,4 +32,6 @@ public interface ProjectService {
 
     Project findOne(Long memberId, Long projectId);
 
+    boolean deleteOne(Long memberId, Long projectId);
+
 }

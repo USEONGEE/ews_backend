@@ -91,4 +91,12 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(NoSuchProjectException::new);
     }
 
+    @Override
+    public boolean deleteOne(Long memberId, Long projectId) {
+        Project project = projectRepository.findByIdAndOwnerId(projectId, memberId)
+                .orElseThrow(NoSuchProjectException::new);
+        projectRepository.delete(project);
+        return true;
+    }
+
 }

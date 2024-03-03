@@ -12,21 +12,21 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 public class ProjectResponseDto {
-    private Long projectId;
+    private Long id;
     private String name;
     private String description;
-    private LocalDateTime createdData;
+    private LocalDateTime createdDate;
     private List<MemberFileResponseDto> memberFiles;
 
     public ProjectResponseDto(Project project) {
-        this.projectId = project.getId();
+        this.id = project.getId();
         this.name = project.getName();
-        this.createdData = project.getCreatedDate();
+        this.createdDate = project.getCreatedDate();
         this.description = project.getDescription();
-//        this.memberFiles = project.getMemberFiles()
-//                .stream()
-//                .map(MemberFileResponseDto::new)
-//                .collect(Collectors.toList());
+        this.memberFiles = project.getMemberFiles()
+                .stream()
+                .map(MemberFileResponseDto::new)
+                .collect(Collectors.toList());
     }
 
 }

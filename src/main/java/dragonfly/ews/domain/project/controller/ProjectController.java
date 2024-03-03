@@ -22,6 +22,7 @@ public class ProjectController {
 
     /**
      * [프로젝트 생성]
+     *
      * @param projectCreateDto
      * @param member
      * @return
@@ -35,7 +36,6 @@ public class ProjectController {
     }
 
     /**
-     *
      * @param member
      * @return
      */
@@ -49,11 +49,19 @@ public class ProjectController {
         return new ResponseEntity<>(SuccessResponse.of(result), HttpStatus.OK);
     }
 
-    @GetMapping("{projectId}")
+    @GetMapping("/{projectId}")
     public ResponseEntity<SuccessResponse> findOne(
             @AuthenticationPrincipal(expression = "member") Member member,
             @PathVariable(value = "projectId") Long projectId) {
-        return new ResponseEntity<>(SuccessResponse.of(projectService.findOne(member.getId(), projectId)),
+        return new ResponseEntity<>(SuccessResponse.of(new ProjectResponseDto(projectService.findOne(member.getId(), projectId))),
+                HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<SuccessResponse> deleteOne(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @PathVariable(value = "projectId") Long projectId) {
+        return new ResponseEntity<>(SuccessResponse.of(projectService.deleteOne(member.getId(), projectId)),
                 HttpStatus.OK);
     }
 }

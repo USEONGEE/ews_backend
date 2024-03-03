@@ -46,7 +46,7 @@ class MemberFileTest {
         MemberFile memberFile = new MemberFile(member, originalFilename, savedFilename);
         memberFileRepository.save(memberFile);
         Project project = createProject(member);
-        memberFile.addProject(project);
+        memberFile.changeProject(project);
 
         em.flush();
         em.clear();
