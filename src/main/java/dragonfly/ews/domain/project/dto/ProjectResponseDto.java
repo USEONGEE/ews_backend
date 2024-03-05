@@ -25,7 +25,7 @@ public class ProjectResponseDto {
         this.description = project.getDescription();
         this.memberFiles = project.getMemberFiles()
                 .stream()
-                .map(MemberFileResponseDto::new)
+                .map(MemberFileResponseDto::of)
                 .collect(Collectors.toList());
     }
 

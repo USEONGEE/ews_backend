@@ -22,7 +22,7 @@ public class MemberFileContainLogsResponseDto {
         this.id = memberFile.getId();
         this.createdDate = memberFile.getCreatedDate();
         this.fileName = memberFile.getFileName();
-        this.fileType = memberFile.getFileType();
+        this.fileType = memberFile.getFileExtension();
         for (MemberFileLog memberFileLog : memberFile.getMemberFileLogs()) {
             this.fileLogs.add(new MemberFileLogResponseDto(memberFileLog));
         }

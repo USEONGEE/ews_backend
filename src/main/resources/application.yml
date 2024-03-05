@@ -28,6 +28,9 @@ logging:
     org:
       hibernate:
         SQL: debug
+        type:
+          descriptor:
+            sql: trace
 
 jwt:
   secretKey: base64로 인코딩된 암호 키, HS512를 사용할 것이기 때문에, 512비트(64바이트) 이상이 되어야 합니다. 영숫자 조합으로 아무렇게나 길게 써주세요!
@@ -47,3 +50,4 @@ analysis:
   server:
     url: http://localhost:8000
     analysis-uri: /analysis
+    column-check-uri: /column-check

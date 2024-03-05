@@ -44,3 +44,5 @@ analysis:
   server:
     url: http://localhost:8000
     analysis-uri: /analysis
+    column-check-uri: /column-check
+

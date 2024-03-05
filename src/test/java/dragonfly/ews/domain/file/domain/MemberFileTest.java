@@ -56,7 +56,7 @@ class MemberFileTest {
         Project findProject = projectRepository.findById(project.getId()).get();
 
         assertThat(findMemberFile.getFileName()).isEqualTo(originalFilename);
-        assertThat(findMemberFile.getFileType()).isEqualTo(fileType);
+        assertThat(findMemberFile.getFileExtension()).isEqualTo(fileType);
         assertThat(findMemberFile.getOwner()).isEqualTo(findMember);
         assertThat(findMemberFile.getCreatedDate()).isNotNull();
         assertThat(findMemberFile.getMemberFileLogs()).isNotNull();

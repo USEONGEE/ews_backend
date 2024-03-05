@@ -17,8 +17,6 @@ public interface MemberFileService {
      * @param file
      * @param memberId
      */
-    @Deprecated
-    boolean saveFile(MultipartFile file, Long memberId);
 
     boolean saveFile(Long memberId, MemberFileCreateDto memberFileCreateDto);
 

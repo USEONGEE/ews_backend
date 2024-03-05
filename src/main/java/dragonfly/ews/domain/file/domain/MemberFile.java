@@ -27,13 +27,14 @@ import java.util.List;
 @Setter(value = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
+@Inheritance(strategy = InheritanceType.JOINED)
 public class MemberFile extends BaseEntity {
     @Id
     @GeneratedValue
     @Column(name = "file_id")
     private Long id;
     private String fileName;
-    private String fileType;
+    private String fileExtension; // csv, xls
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
@@ -51,7 +52,7 @@ public class MemberFile extends BaseEntity {
     public MemberFile(@NotNull Member owner, @NotNull String submittedFileName,
                       @NotNull String originalFilename, @NotNull String savedFilename) {
         this.fileName = submittedFileName;
-        this.fileType = getFileExt(originalFilename);
+        this.fileExtension = getFileExt(originalFilename);
         this.owner = owner;
         getOwner().getMemberFiles().add(this);
 
@@ -61,7 +62,7 @@ public class MemberFile extends BaseEntity {
 
     public MemberFile(@NotNull Member owner, @NotNull String originalFilename, @NotNull String savedFilename) {
         this.fileName = originalFilename;
-        this.fileType = getFileExt(originalFilename);
+        this.fileExtension = getFileExt(originalFilename);
         this.owner = owner;
         getOwner().getMemberFiles().add(this);
 
@@ -96,7 +97,7 @@ public class MemberFile extends BaseEntity {
      */
     private void validateSavedFilename(String savedFilename) {
         String ext = getFileExt(savedFilename);
-        if (!ext.equals(getFileType())) {
+        if (!ext.equals(getFileExtension())) {
             throw new ExtensionNotFoundException("파일의 확장자가 동일해야합니다.");
         }
     }
@@ -135,6 +136,14 @@ public class MemberFile extends BaseEntity {
 
     public void changeDescription(String description) {
         setDescription(description);
+    }
+
+    public String getOriginalName() {
+        return getFileName() + '.' + getFileExtension();
+    }
+
+    public boolean isSameExt(String ext) {
+        return getFileExtension().equalsIgnoreCase(ext);
     }
 
 }

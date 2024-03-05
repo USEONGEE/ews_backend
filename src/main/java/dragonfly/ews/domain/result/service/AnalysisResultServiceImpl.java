@@ -36,6 +36,8 @@ public class AnalysisResultServiceImpl implements AnalysisResultService {
     @Value("${file.dir}")
     private String fileDir;
 
+    @Value("${analysis.server.url}")
+    private String analysisServerUri;
     @Value("${analysis.server.analysis-uri}")
     private String analysisUri;
 
@@ -73,7 +75,7 @@ public class AnalysisResultServiceImpl implements AnalysisResultService {
         // 비동기 요청 보내기
         // HTML 파일은 분석 서버에서 "문자열"로 반환함
         webClient.post()
-                .uri(analysisUri)
+                .uri(analysisServerUri + analysisUri)
                 .bodyValue(multipartBody)
                 .retrieve()
                 .bodyToMono(String.class)

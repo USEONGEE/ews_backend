@@ -42,16 +42,13 @@ public class MemberFileController {
      * [파일 업데이트]
      * <br/> 파일 로그 추가
      *
-     * @param memberFileId
      * @param member
      * @return
      */
-    @PostMapping("/{memberFileId}")
+    @PostMapping("/update")
     public ResponseEntity<SuccessResponse> updateFile(
             @ModelAttribute MemberFileUpdateDto memberFileUpdateDto,
-            @PathVariable(value = "memberFileId") Long memberFileId,
             @AuthenticationPrincipal(expression = "member") Member member) {
-        memberFileUpdateDto.setMemberFileId(memberFileId);
         return new ResponseEntity<>(SuccessResponse.of(memberFileService.updateFile(member.getId(),
                 memberFileUpdateDto)), HttpStatus.OK);
     }
@@ -82,7 +79,7 @@ public class MemberFileController {
     public ResponseEntity<SuccessResponse> findAll(@AuthenticationPrincipal(expression = "member") Member member) {
         List<MemberFile> memberFiles = memberFileService.findAll(member.getId());
         List<MemberFileResponseDto> dtos = memberFiles.stream()
-                .map(MemberFileResponseDto::new)
+                .map(MemberFileResponseDto::of)
                 .toList();
         return new ResponseEntity<>(SuccessResponse.of(dtos), HttpStatus.OK);
     }
