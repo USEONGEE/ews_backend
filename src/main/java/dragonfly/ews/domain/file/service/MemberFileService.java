@@ -14,21 +14,11 @@ public interface MemberFileService {
      * <br/> 프로젝트 내에 같은 파일의 존재 여부를 확인해야함. -> 존재시 업데이트
      * <br/>
      *
-     * @param file
      * @param memberId
      */
 
     boolean saveFile(Long memberId, MemberFileCreateDto memberFileCreateDto);
 
-    /**
-     * []
-     * @param file
-     * @param memberId
-     * @param fileId
-     */
-
-    @Deprecated
-    boolean updateFile(MultipartFile file, Long memberId, Long fileId);
 
     boolean updateFile(Long memberId, MemberFileUpdateDto memberFileUpdateDto);
 

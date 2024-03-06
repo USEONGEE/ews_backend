@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.file.service;
+package dragonfly.ews.domain.file.postprocessor;
 
 import dragonfly.ews.domain.file.domain.ExcelFileColumn;
 import dragonfly.ews.domain.file.domain.ExcelMemberFile;
@@ -34,7 +34,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class ExcelMemberFilePostProcessor implements MemberFilePostProcessor<ExcelMemberFile> {
+public class ExcelMemberFilePostProcessProvider implements MemberFilePostProcessProvider<ExcelMemberFile> {
 
     @Override
     public boolean canProcess(String extension) {
