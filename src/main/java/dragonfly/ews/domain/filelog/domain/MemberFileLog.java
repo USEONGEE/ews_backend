@@ -29,6 +29,8 @@ public class MemberFileLog extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "memberFileLog")
     private List<AnalysisResult> analysisResults = new ArrayList<>();
 
+    private boolean isValidated = false;
+
 
     public MemberFileLog(MemberFile memberFile, String savedName) {
         this.memberFile = memberFile;
@@ -37,6 +39,10 @@ public class MemberFileLog extends BaseEntity {
 
     public void changeDescription(String description) {
         setDescription(description);
+    }
+
+    public void changeValidated(boolean b) {
+        this.isValidated = b;
     }
 
 }

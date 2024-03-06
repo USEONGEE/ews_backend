@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.file.postprocessor;
+package dragonfly.ews.domain.file.deprecated.postprocessor;
 
 import dragonfly.ews.domain.file.domain.MemberFile;
 import lombok.RequiredArgsConstructor;

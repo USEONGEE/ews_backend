@@ -1,5 +1,6 @@
-package dragonfly.ews.domain.file.postprocessor;
+package dragonfly.ews.domain.file.deprecated.postprocessor;
 
+import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface MemberFilePostProcessProvider<T> {
 
-    boolean canProcess(String extension);
+    boolean canProcess(FileExtension fileExtension);
 
     void process(MemberFile target, MultipartFile multipartFile);
 }

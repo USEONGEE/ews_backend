@@ -34,7 +34,8 @@ public class MemberFile extends BaseEntity {
     @Column(name = "file_id")
     private Long id;
     private String fileName;
-    private String fileExtension; // csv, xls
+    @Enumerated(value = EnumType.STRING)
+    private FileExtension fileExtension; // csv, xls
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
@@ -52,22 +53,22 @@ public class MemberFile extends BaseEntity {
     public MemberFile(@NotNull Member owner, @NotNull String submittedFileName,
                       @NotNull String originalFilename, @NotNull String savedFilename) {
         this.fileName = submittedFileName;
-        this.fileExtension = getFileExt(originalFilename);
+        this.fileExtension = extractFileExtension(originalFilename);
         this.owner = owner;
         getOwner().getMemberFiles().add(this);
 
-        validateSavedFilename(savedFilename);
-        updateFile(savedFilename);
+        MemberFileLog memberFileLog = new MemberFileLog(this, savedFilename);
+        getMemberFileLogs().add(memberFileLog);
     }
 
     public MemberFile(@NotNull Member owner, @NotNull String originalFilename, @NotNull String savedFilename) {
         this.fileName = originalFilename;
-        this.fileExtension = getFileExt(originalFilename);
+        this.fileExtension = extractFileExtension(originalFilename);
         this.owner = owner;
         getOwner().getMemberFiles().add(this);
 
-        validateSavedFilename(savedFilename);
-        updateFile(savedFilename);
+        MemberFileLog memberFileLog = new MemberFileLog(this, savedFilename);
+        getMemberFileLogs().add(memberFileLog);
     }
 
     /**
@@ -78,12 +79,13 @@ public class MemberFile extends BaseEntity {
      * @return
      * @throws dragonfly.ews.domain.file.exception.ExtensionNotFoundException
      */
-    private String getFileExt(String fileName) {
+    private FileExtension extractFileExtension(String fileName) {
         int lastDotIndex = fileName.lastIndexOf(".");
         if (lastDotIndex < 0) {
             throw new ExtensionNotFoundException("파일 확장자를 찾을 수 없습니다. 파일 확장자가 파일 이름에 포함되어야합니다.");
         }
-        return fileName.substring(lastDotIndex + 1);
+        String substring = fileName.substring(lastDotIndex + 1);
+        return FileExtension.fromString(substring);
     }
 
     /**
@@ -96,26 +98,13 @@ public class MemberFile extends BaseEntity {
      * @throws dragonfly.ews.domain.file.exception.ExtensionNotEqualException
      */
     private void validateSavedFilename(String savedFilename) {
-        String ext = getFileExt(savedFilename);
-        if (!ext.equals(getFileExtension())) {
+        FileExtension ext = extractFileExtension(savedFilename);
+        if (!isSameExt(ext)) {
             throw new ExtensionNotFoundException("파일의 확장자가 동일해야합니다.");
         }
     }
 
     // ==편의 메소드==
-
-    /**
-     * [파일 업데이트 및 로그 엔티티 생성]
-     * <br/> MemberFileLog 를 생성할 때 DTO를 사용하지 않아서 제거
-     *
-     * @param savedFilename
-     */
-    @Deprecated
-    public void updateFile(@NotNull String savedFilename) {
-        validateSavedFilename(savedFilename);
-        MemberFileLog memberFileLog = new MemberFileLog(this, savedFilename);
-        getMemberFileLogs().add(memberFileLog);
-    }
 
     public void updateFile(MemberFileLogCreateDto memberFileLogCreateDto) {
         String savedFileName = memberFileLogCreateDto.getSavedFileName();
@@ -142,8 +131,12 @@ public class MemberFile extends BaseEntity {
         return getFileName() + '.' + getFileExtension();
     }
 
-    public boolean isSameExt(String ext) {
-        return getFileExtension().equalsIgnoreCase(ext);
+    public boolean isSameExt(FileExtension extension) {
+        return getFileExtension() == extension;
+    }
+
+    public boolean isSameExt(String extension) {
+        return getFileExtension() == FileExtension.fromString(extension);
     }
 
 }

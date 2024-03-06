@@ -1,5 +1,6 @@
 package dragonfly.ews.domain.file.dto;
 
+import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 public class MemberFileResponseDto {
     private Long id;
     private String fileName;
-    private String fileType;
+    private FileExtension fileExtension;
     private String description;
     private LocalDateTime createdDate;
 
@@ -23,7 +24,7 @@ public class MemberFileResponseDto {
         return MemberFileResponseDto.builder()
                 .id(memberFile.getId())
                 .fileName(memberFile.getFileName())
-                .fileType(memberFile.getFileExtension())
+                .fileExtension(memberFile.getFileExtension())
                 .createdDate(memberFile.getCreatedDate())
                 .description(memberFile.getDescription())
                 .build();

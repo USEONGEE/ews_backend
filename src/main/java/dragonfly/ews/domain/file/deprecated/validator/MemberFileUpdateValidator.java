@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.file.validator;
+package dragonfly.ews.domain.file.deprecated.validator;
 
 import dragonfly.ews.domain.file.FileUtils;
 import dragonfly.ews.domain.file.domain.MemberFile;

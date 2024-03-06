@@ -11,10 +11,14 @@ public class MemberFileLogResponseDto {
     private Long id;
     private LocalDateTime createdDate;
     private String description;
+    private boolean validated;
+    private String fileName;
 
     public MemberFileLogResponseDto(MemberFileLog memberFileLog) {
         this.id = memberFileLog.getId();
         this.createdDate = memberFileLog.getCreatedDate();
         this.description = memberFileLog.getDescription();
+        this.validated = memberFileLog.isValidated();
+        this.fileName = memberFileLog.getMemberFile().getFileName();
     }
 }

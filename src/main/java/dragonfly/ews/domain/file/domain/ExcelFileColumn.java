@@ -1,6 +1,5 @@
 package dragonfly.ews.domain.file.domain;
 
-import dragonfly.ews.domain.base.BaseEntity;
 import dragonfly.ews.domain.base.BaseTimeEntity;
 import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
 import jakarta.persistence.*;
@@ -25,9 +24,8 @@ public class ExcelFileColumn extends BaseTimeEntity {
     @JoinColumn(name = "excel_file_id")
     private ExcelMemberFile excelMemberFile;
 
-    public ExcelFileColumn(ExcelMemberFile excelMemberFile, ExcelFileColumnCreateDto excelFileColumnCreateDto) {
+    public ExcelFileColumn(ExcelFileColumnCreateDto excelFileColumnCreateDto) {
         this.columnName = excelFileColumnCreateDto.getColumnName();
         this.dataType = excelFileColumnCreateDto.getDataType();
-        this.excelMemberFile = excelMemberFile;
     }
 }

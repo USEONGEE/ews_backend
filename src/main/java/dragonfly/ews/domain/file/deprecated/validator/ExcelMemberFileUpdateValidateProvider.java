@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.file.validator;
+package dragonfly.ews.domain.file.deprecated.validator;
 
 import dragonfly.ews.domain.file.FileUtils;
 import dragonfly.ews.domain.file.domain.MemberFile;
@@ -27,6 +27,7 @@ public class ExcelMemberFileUpdateValidateProvider implements MemberFileUpdateVa
         String fileExt = memberFileUtils.getFileExt(target.getOriginalFilename());
         checkFileExtension(memberFile, fileExt);
         // TODO 파일 column이 같은지 + 데이터 타입이 같은지
+
     }
 
     private void hasProject(MemberFile memberFile) {

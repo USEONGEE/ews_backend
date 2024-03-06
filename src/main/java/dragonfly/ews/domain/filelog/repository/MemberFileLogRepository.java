@@ -22,7 +22,7 @@ public interface MemberFileLogRepository extends JpaRepository<MemberFileLog, Lo
     @Query("select mfl from MemberFileLog mfl join fetch mfl.analysisResults far where mfl.id = :memberFileLogId")
     Optional<MemberFileLog> findByIdContainResult(@Param("memberFileLogId") Long memberFileLogId);
 
-    @Query(value = "select mfl from MemberFileLog mfl where mfl.memberFile.owner.id = :memberId",
+    @Query(value = "select mfl from MemberFileLog mfl left join fetch mfl.memberFile where mfl.memberFile.owner.id = :memberId",
             countQuery = "select count(mfl) from MemberFileLog mfl where mfl.memberFile.owner.id = :memberId")
     Page<MemberFileLog> findByOwnerId(@Param("memberId") Long memberId, Pageable pageable);
 }

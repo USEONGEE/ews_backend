@@ -1,7 +1,8 @@
-package dragonfly.ews.domain.file.postprocessor;
+package dragonfly.ews.domain.file.deprecated.postprocessor;
 
 import dragonfly.ews.domain.file.domain.ExcelFileColumn;
 import dragonfly.ews.domain.file.domain.ExcelMemberFile;
+import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
 import dragonfly.ews.domain.file.exception.CannotSaveFileException;
@@ -28,6 +29,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static dragonfly.ews.domain.file.domain.FileExtension.*;
+
 /**
  * Excel 파일에 대하여 첫 컬럼을 읽고 ExcelFileColumn 을 생성 후 저장
  */
@@ -37,19 +40,18 @@ import java.util.List;
 public class ExcelMemberFilePostProcessProvider implements MemberFilePostProcessProvider<ExcelMemberFile> {
 
     @Override
-    public boolean canProcess(String extension) {
-        return extension.equalsIgnoreCase("csv") || extension.equalsIgnoreCase("xlsx")
-                || extension.equalsIgnoreCase("xls");
+    public boolean canProcess(FileExtension extension) {
+        return extension == CSV || extension == XLS || extension == XLSX;
     }
 
     @Override
     public void process(MemberFile target, MultipartFile multipartFile) {
         List<ExcelFileColumnCreateDto> dtos = null;
         try {
-            String fileType = target.getFileExtension();
-            if (fileType.equalsIgnoreCase(".csv")) {
+            FileExtension fileExtension = target.getFileExtension();
+            if (fileExtension == CSV) {
                 dtos = processCsvFile(multipartFile.getInputStream());
-            } else if (fileType.equalsIgnoreCase("xls") || fileType.equalsIgnoreCase("xlsx")) {
+            } else if (fileExtension == XLS || fileExtension == XLSX) {
                 dtos = processExcelFile(multipartFile.getInputStream());
             }
             saveMemberFile((ExcelMemberFile) target, dtos);
@@ -61,7 +63,7 @@ public class ExcelMemberFilePostProcessProvider implements MemberFilePostProcess
     // TODO 메소드 이름 바꾸기
     private void saveMemberFile(ExcelMemberFile memberFile, List<ExcelFileColumnCreateDto> dtos) {
         for (ExcelFileColumnCreateDto dto : dtos) {
-            memberFile.addColumn(new ExcelFileColumn(memberFile, dto));
+            memberFile.addColumn(new ExcelFileColumn(dto));
         }
     }
 

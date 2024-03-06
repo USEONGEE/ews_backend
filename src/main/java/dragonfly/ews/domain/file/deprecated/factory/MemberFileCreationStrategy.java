@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.file.factory;
+package dragonfly.ews.domain.file.deprecated.factory;
 
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.member.domain.Member;
