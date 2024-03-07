@@ -25,4 +25,6 @@ public interface MemberFileLogRepository extends JpaRepository<MemberFileLog, Lo
     @Query(value = "select mfl from MemberFileLog mfl left join fetch mfl.memberFile where mfl.memberFile.owner.id = :memberId",
             countQuery = "select count(mfl) from MemberFileLog mfl where mfl.memberFile.owner.id = :memberId")
     Page<MemberFileLog> findByOwnerId(@Param("memberId") Long memberId, Pageable pageable);
+
+    List<MemberFileLog> findByMemberFileId(Long memberFileId);
 }

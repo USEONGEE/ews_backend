@@ -9,11 +9,12 @@ import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
 import dragonfly.ews.domain.file.service.MemberFileService;
 import dragonfly.ews.domain.member.domain.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,7 +26,9 @@ public class MemberFileController {
 
     /**
      * [파일 추가]
-     *
+     * <p/> - 파일의 확장자(ex. csv, xlsx, pdf .. )에 따라 다른 절차를 통해 저장됨
+     * <br/>- {@link dragonfly.ews.domain.file.aop.utils.MemberFileManger}를 참조
+     * @param member
      * @param member
      * @return
      */
@@ -39,8 +42,9 @@ public class MemberFileController {
 
     /**
      * [파일 업데이트]
-     * <br/> 파일 로그 추가
-     *
+     * <p/> - 파일 로그 추가
+     * <br/> - 파일의 확장자(ex. csv, xlsx, pdf .. )에 따라 다른 절차를 통해 저장됨
+     * <br/>- {@link dragonfly.ews.domain.file.aop.utils.MemberFileManger}를 참조
      * @param member
      * @return
      */
@@ -54,7 +58,10 @@ public class MemberFileController {
 
     /**
      * [파일 세부 조회]
-     * <br/> 하나의 논리적 파일에 속한 파일 로그 조회
+     * <p/> - 하나의 논리적 파일 조회
+     * <br/>- memberFileLogs를 포함
+     * <br/>- 파일의 확장자(ex. csv, xlsx, pdf .. )에 따라서 다른 값이 추가될 수 있음
+     * <br/>- {@link dragonfly.ews.domain.file.aop.utils.MemberFileManger}를 참조
      *
      * @param memberFileId
      * @param member
@@ -63,23 +70,24 @@ public class MemberFileController {
     @GetMapping("/{memberFileId}")
     public ResponseEntity<SuccessResponse> findFile(@PathVariable(value = "memberFileId") Long memberFileId,
                                                     @AuthenticationPrincipal(expression = "member") Member member) {
-        MemberFile memberFile = memberFileService.findByIdContainLogs(member.getId(), memberFileId);
-        return new ResponseEntity<>(SuccessResponse.of(new MemberFileContainLogsResponseDto(memberFile)), HttpStatus.OK);
+        Object data = memberFileService.findByIdContainLogs(member.getId(), memberFileId);
+        return new ResponseEntity<>(SuccessResponse.of(data), HttpStatus.OK);
     }
 
     /**
      * [파일 전체 조회]
-     * <br/> 회원이 가지고 있는 논리 파일 전체 조회
-     *
+     * <p/> 회원이 가지고 있는 논리 파일 전체 조회
+     * <br/>- 파일의 확장자(ex. csv, xlsx, pdf .. )에 따라서 다른 값이 추가될 수 있음
+     * <br/>- {@link dragonfly.ews.domain.file.aop.utils.MemberFileManger}를 참조
      * @param member
      * @return
      */
     @GetMapping("/all")
-    public ResponseEntity<SuccessResponse> findAll(@AuthenticationPrincipal(expression = "member") Member member) {
-        List<MemberFile> memberFiles = memberFileService.findAll(member.getId());
-        List<MemberFileResponseDto> dtos = memberFiles.stream()
-                .map(MemberFileResponseDto::of)
-                .toList();
+    public ResponseEntity<SuccessResponse> findAll(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            Pageable pageable) {
+        Page<MemberFile> paging = memberFileService.findPaging(member.getId(), pageable);
+        Page<MemberFileResponseDto> dtos = paging.map(MemberFileResponseDto::of);
         return new ResponseEntity<>(SuccessResponse.of(dtos), HttpStatus.OK);
     }
 }

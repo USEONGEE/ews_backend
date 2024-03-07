@@ -16,4 +16,6 @@ public interface MemberFileManger {
     MemberFile createMemberFile(Member owner, MemberFileCreateDto memberFileCreateDto);
 
     void beforeUpdateValidate(MemberFile memberFile, MultipartFile target);
+
+    Object findDtoById(Long memberId, Long memberFileId);
 }

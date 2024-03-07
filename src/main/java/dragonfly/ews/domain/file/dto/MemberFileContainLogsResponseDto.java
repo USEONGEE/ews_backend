@@ -4,6 +4,8 @@ import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.dto.MemberFileLogResponseDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +21,7 @@ public class MemberFileContainLogsResponseDto {
     private FileExtension fileExtension;
     private LocalDateTime createdDate;
     private List<MemberFileLogResponseDto> fileLogs = new ArrayList<>();
+
 
     public MemberFileContainLogsResponseDto(MemberFile memberFile) {
         this.id = memberFile.getId();

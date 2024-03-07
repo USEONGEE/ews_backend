@@ -18,6 +18,8 @@ import dragonfly.ews.domain.project.exception.NoSuchProjectException;
 import dragonfly.ews.domain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,17 +81,16 @@ public class MemberFileService {
         return true;
     }
 
-    public MemberFile findByIdContainLogs(Long memberId, Long memberFileId) {
-        memberFileRepository.findByIdAuth(memberId, memberFileId)
-                .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
-        return memberFileRepository.findByIdContainLogs(memberFileId)
-                .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
+    @UseMemberFileManager
+    public Object findByIdContainLogs(Long memberId, Long memberFileId) {
+        return memberFileManger.findDtoById(memberId, memberFileId);
     }
 
-    public List<MemberFile> findAll(Long memberId) {
+    // TODO @UseMemberFileManager 사용하도록 추가해야함
+    public Page<MemberFile> findPaging(Long memberId, Pageable pageable) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."))  ;
-        List<MemberFile> result = memberFileRepository.findByMemberId(member.getId());
+                .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));
+        Page<MemberFile> result = memberFileRepository.findByMemberId(member.getId(), pageable);
 
         return result;
     }

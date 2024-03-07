@@ -4,11 +4,18 @@ import dragonfly.ews.domain.file.FileUtils;
 import dragonfly.ews.domain.file.aop.utils.DataTypeProvider;
 import dragonfly.ews.domain.file.domain.ExcelFileColumn;
 import dragonfly.ews.domain.file.domain.ExcelMemberFile;
+import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
+import dragonfly.ews.domain.file.dto.ExcelMemberFileContainLogsResponseDto;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.file.exception.*;
+import dragonfly.ews.domain.file.repository.ExcelFileColumnRepository;
 import dragonfly.ews.domain.file.repository.ExcelMemberFileRepository;
+import dragonfly.ews.domain.file.repository.ExcelMemberFileRepositoryApi;
+import dragonfly.ews.domain.file.repository.MemberFileRepository;
+import dragonfly.ews.domain.filelog.domain.MemberFileLog;
+import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +24,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -34,6 +40,9 @@ public class XlsxStrategy implements MemberFileStrategy {
 
     private final DataTypeProvider dataTypeProvider;
     private final FileUtils memberFileUtils;
+    private final ExcelFileColumnRepository excelFileColumnRepository;
+    private final ExcelMemberFileRepository excelMemberFileRepository;
+    private final MemberFileLogRepository memberFileLogRepository;
 
     public List<ExcelFileColumnCreateDto> savePreProcess(MultipartFile multipartFile) {
         try {
@@ -80,6 +89,11 @@ public class XlsxStrategy implements MemberFileStrategy {
     }
 
     @Override
+    public boolean canSupport(FileExtension fileExtension) {
+        return fileExtension == FileExtension.XLSX || fileExtension == FileExtension.XLS;
+    }
+
+    @Override
     public MemberFile createMemberFile(Member owner, MemberFileCreateDto memberFileCreateDto) {
         //
         List<ExcelFileColumnCreateDto> dtos = savePreProcess(memberFileCreateDto.getFile());
@@ -117,6 +131,19 @@ public class XlsxStrategy implements MemberFileStrategy {
         checkFileExtension(memberFile, fileExt);
         // TODO 파일 column이 같은지 + 데이터 타입이 같은지
 
+    }
+
+
+    // TODO 총 3번의 쿼리가 나간다. 수정 필요, 2번의 컬렉션 페치 조인을 해결해야함
+    @Override
+    public Object findDtoById(Long memberId, Long memberFileId) {
+        ExcelMemberFile excelMemberFile = excelMemberFileRepository.findById(memberFileId)
+                .orElseThrow(NoSuchFileException::new);
+        List<ExcelFileColumn> excelFileColumns = excelFileColumnRepository.findByExcelMemberFileId(memberFileId);
+        List<MemberFileLog> memberFileLogs = memberFileLogRepository.findByMemberFileId(memberFileId);
+        excelMemberFile.injectMemberFileLogs(memberFileLogs);
+        excelMemberFile.injectExcelFileColumns(excelFileColumns);
+        return new ExcelMemberFileContainLogsResponseDto(excelMemberFile);
     }
 
     private void hasProject(MemberFile memberFile) {

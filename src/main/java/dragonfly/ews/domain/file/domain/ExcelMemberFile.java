@@ -1,5 +1,6 @@
 package dragonfly.ews.domain.file.domain;
 
+import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.member.domain.Member;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -35,4 +36,14 @@ public class ExcelMemberFile extends MemberFile {
         columns.remove(column);
         column.setExcelMemberFile(null);
     }
+
+    /**
+     * [MemberFileLog 주입하기]
+     * 2번의 컬렉션 조인이 불가능하기에 컬렉션을 주입하기 위해 사용
+     * @param excelFileColumns
+     */
+    public void injectExcelFileColumns(List<ExcelFileColumn> excelFileColumns) {
+        this.columns = excelFileColumns;
+    }
+
 }

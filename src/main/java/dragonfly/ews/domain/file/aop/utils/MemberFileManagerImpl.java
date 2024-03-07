@@ -9,10 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-/**
- * TODO UserFileStategy를 통해 전략 주입을 하지 않았으면은 MemberFileManager를 사용하면 안 됨
- * 
- */
+
+// TODO UserFileStategy를 통해 전략 주입을 하지 않았으면은 MemberFileManager를 사용하면 안 됨
 public class MemberFileManagerImpl implements MemberFileManger, MemberFileManagerConfig {
     private final ThreadLocal<MemberFileStrategy> fileStrategy = new ThreadLocal<>();
 
@@ -36,6 +34,12 @@ public class MemberFileManagerImpl implements MemberFileManger, MemberFileManage
     public void beforeUpdateValidate(MemberFile memberFile, MultipartFile target) {
         MemberFileStrategy memberFileStrategy = getFileStrategy();
         memberFileStrategy.updateValidate(memberFile, target);
+    }
+
+    @Override
+    public Object findDtoById(Long memberId, Long memberFileId) {
+        MemberFileStrategy memberFileStrategy = getFileStrategy();
+        return memberFileStrategy.findDtoById(memberId, memberFileId);
     }
 
 }
