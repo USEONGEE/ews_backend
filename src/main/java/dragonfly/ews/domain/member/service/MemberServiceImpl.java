@@ -1,6 +1,6 @@
 package dragonfly.ews.domain.member.service;
 
-import dragonfly.ews.domain.file.FileUtils;
+import dragonfly.ews.domain.file.utils.FileUtils;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.domain.MemberRole;
 import dragonfly.ews.domain.member.dto.MemberSignUpDto;

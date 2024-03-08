@@ -1,9 +1,9 @@
 package dragonfly.ews.domain.file.service;
 
-import dragonfly.ews.domain.file.FileUtils;
+import dragonfly.ews.domain.file.utils.FileUtils;
 import dragonfly.ews.domain.file.aop.annotation.HasMultipartFile;
 import dragonfly.ews.domain.file.aop.annotation.UseMemberFileManager;
-import dragonfly.ews.domain.file.aop.utils.MemberFileManger;
+import dragonfly.ews.domain.file.aop.utils.MemberFileManager;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
@@ -23,8 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -36,7 +34,8 @@ public class MemberFileService {
     private final FileUtils memberFileUtils;
     private final ProjectRepository projectRepository;
     // UseMemberFileManager 가 붙어야 사용 가능
-    private final MemberFileManger memberFileManger;
+    private final MemberFileManager memberFileManager;
+
 
     @UseMemberFileManager
     @HasMultipartFile
@@ -49,7 +48,7 @@ public class MemberFileService {
 
         // 파일 이름 가져오고 저장할 파일이름 만들기
         // MemberFile 저장하기
-        MemberFile memberFile = memberFileManger.createMemberFile(member, memberFileCreateDto);
+        MemberFile memberFile = memberFileManager.createMemberFile(member, memberFileCreateDto);
         memberFile.changeProject(project);
         memberFile.changeDescription(memberFileCreateDto.getDescription());
         memberFileRepository.save(memberFile);
@@ -67,7 +66,7 @@ public class MemberFileService {
                 .orElseThrow(() -> new NoSuchFileException("해당 파일을 찾을 수 없습니다."));
 
         // 검증
-        memberFileManger.beforeUpdateValidate(memberFile, memberFileUpdateDto.getFile());
+        memberFileManager.beforeUpdateValidate(memberFile, memberFileUpdateDto.getFile());
 
         // 저장될 파일명 생성
         String savedFilename = memberFileUtils.createSavedFilename(memberFile.getOriginalName());
@@ -83,10 +82,9 @@ public class MemberFileService {
 
     @UseMemberFileManager
     public Object findByIdContainLogs(Long memberId, Long memberFileId) {
-        return memberFileManger.findDtoById(memberId, memberFileId);
+        return memberFileManager.findDtoById(memberId, memberFileId);
     }
 
-    // TODO @UseMemberFileManager 사용하도록 추가해야함
     public Page<MemberFile> findPaging(Long memberId, Pageable pageable) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchMemberException("해당 회원이 존재하지 않습니다."));

@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  * <br/>
  * {@link dragonfly.ews.domain.file.aop.aspect.MemberFileStrategyAspect}
  */
-public interface MemberFileManger {
+public interface MemberFileManager {
     MemberFile createMemberFile(Member owner, MemberFileCreateDto memberFileCreateDto);
 
     void beforeUpdateValidate(MemberFile memberFile, MultipartFile target);

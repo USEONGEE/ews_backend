@@ -1,8 +1,8 @@
 package dragonfly.ews.domain.file.controller;
 
 import dragonfly.ews.common.handler.SuccessResponse;
+import dragonfly.ews.domain.file.aop.utils.MemberFileManager;
 import dragonfly.ews.domain.file.domain.MemberFile;
-import dragonfly.ews.domain.file.dto.MemberFileContainLogsResponseDto;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.file.dto.MemberFileResponseDto;
 import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/file")
@@ -27,7 +25,7 @@ public class MemberFileController {
     /**
      * [파일 추가]
      * <p/> - 파일의 확장자(ex. csv, xlsx, pdf .. )에 따라 다른 절차를 통해 저장됨
-     * <br/>- {@link dragonfly.ews.domain.file.aop.utils.MemberFileManger}를 참조
+     * <br/>- {@link MemberFileManager}를 참조
      * @param member
      * @param member
      * @return
@@ -44,7 +42,7 @@ public class MemberFileController {
      * [파일 업데이트]
      * <p/> - 파일 로그 추가
      * <br/> - 파일의 확장자(ex. csv, xlsx, pdf .. )에 따라 다른 절차를 통해 저장됨
-     * <br/>- {@link dragonfly.ews.domain.file.aop.utils.MemberFileManger}를 참조
+     * <br/>- {@link MemberFileManager}를 참조
      * @param member
      * @return
      */
@@ -61,7 +59,7 @@ public class MemberFileController {
      * <p/> - 하나의 논리적 파일 조회
      * <br/>- memberFileLogs를 포함
      * <br/>- 파일의 확장자(ex. csv, xlsx, pdf .. )에 따라서 다른 값이 추가될 수 있음
-     * <br/>- {@link dragonfly.ews.domain.file.aop.utils.MemberFileManger}를 참조
+     * <br/>- {@link MemberFileManager}를 참조
      *
      * @param memberFileId
      * @param member
@@ -77,9 +75,6 @@ public class MemberFileController {
     /**
      * [파일 전체 조회]
      * <p/> 회원이 가지고 있는 논리 파일 전체 조회
-     * <br/>- 파일의 확장자(ex. csv, xlsx, pdf .. )에 따라서 다른 값이 추가될 수 있음
-     * <br/>- {@link dragonfly.ews.domain.file.aop.utils.MemberFileManger}를 참조
-     * @param member
      * @return
      */
     @GetMapping("/all")

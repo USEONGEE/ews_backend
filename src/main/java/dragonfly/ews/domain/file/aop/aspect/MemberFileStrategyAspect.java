@@ -1,7 +1,7 @@
 package dragonfly.ews.domain.file.aop.aspect;
 
-import dragonfly.ews.domain.file.FileUtils;
-import dragonfly.ews.domain.file.aop.strategy.MemberFileStrategy;
+import dragonfly.ews.domain.file.utils.FileUtils;
+import dragonfly.ews.domain.base.aop.strategy.MemberFileStrategy;
 import dragonfly.ews.domain.file.aop.utils.MemberFileManagerConfig;
 import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * [UseMemberFileManger 어노테이션이 붙은 메소드에 대한 AOP를 적용하는 클래스]
- * <p/> UserMemberFileManager은 {@link dragonfly.ews.domain.file.aop.strategy.MemberFileStrategy} 를 사용한다.
+ * <p/> UserMemberFileManager은 {@link MemberFileStrategy} 를 사용한다.
  */
 
 @Aspect
@@ -43,6 +43,7 @@ public class MemberFileStrategyAspect {
     public void setFileStrategyBasedOnExtension(JoinPoint joinPoint) {
         MultipartFile multipartFile = null;
         for (Object arg : joinPoint.getArgs()) {
+            // TODO State 패턴으로 변경 필요할 수도
             // DTO가 추가되면 추가해야함
             if (arg instanceof MemberFileCreateDto) {
                 multipartFile = ((MemberFileCreateDto) arg).getFile();
@@ -56,7 +57,7 @@ public class MemberFileStrategyAspect {
             throw new IllegalArgumentException("[MemberFileStrategyAspect] 파일에 확장자가 존재하지 않습니다.");
         } else {
             FileExtension fileExtension = FileExtension.fromString(
-                    fileUtils.getFileExt(multipartFile.getOriginalFilename()));
+                    fileUtils.extractFileExtension(multipartFile.getOriginalFilename()));
             setFileStrategyBasedOnExtension(fileExtension);
         }
     }

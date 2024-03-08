@@ -5,7 +5,7 @@ import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.dto.ExcelDataDto;
 import dragonfly.ews.domain.filelog.dto.MemberFileLogContainResultsResponseDto;
 import dragonfly.ews.domain.filelog.dto.MemberFileLogResponseDto;
-import dragonfly.ews.domain.filelog.service.FileReadManager;
+import dragonfly.ews.domain.file.utils.ExcelFileReader;
 import dragonfly.ews.domain.filelog.service.MemberFileLogService;
 import dragonfly.ews.domain.member.domain.Member;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class MemberFileLogController {
     private String fileDir;
 
     private final MemberFileLogService memberFileLogService;
-    private final FileReadManager fileReadManager;
+    private final ExcelFileReader fileReadManager;
 
     /**
      * [파일로그의 엑셀 데이터를 일부 조회]
@@ -42,7 +42,7 @@ public class MemberFileLogController {
             @AuthenticationPrincipal(expression = "member") Member member) {
         MemberFileLog memberFileLog = memberFileLogService.findById(member.getId(), memberFileLogId);
         String savedName = memberFileLog.getSavedName();
-        ExcelDataDto excelDataDto = (ExcelDataDto) fileReadManager.resolve(fileDir + savedName);
+        ExcelDataDto excelDataDto = (ExcelDataDto) fileReadManager.read(fileDir + savedName);
 
         return new ResponseEntity<>(SuccessResponse.of(excelDataDto), HttpStatus.OK);
     }

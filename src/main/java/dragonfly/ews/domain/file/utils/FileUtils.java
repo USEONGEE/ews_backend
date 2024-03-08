@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.file;
+package dragonfly.ews.domain.file.utils;
 
 import dragonfly.ews.domain.file.exception.CannotSaveFileException;
 import dragonfly.ews.domain.file.exception.ExtensionNotFoundException;
@@ -17,10 +17,10 @@ public class FileUtils {
     @Value("${file.dir}")
     private String fileDir;
     public String createSavedFilename(String originalFilename) {
-        return UUID.randomUUID().toString() + "." + getFileExt(originalFilename);
+        return UUID.randomUUID().toString() + "." + extractFileExtension(originalFilename);
     }
     
-    public String getFileExt(String fileName) {
+    public String extractFileExtension(String fileName) {
         int lastDotIndex = fileName.lastIndexOf(".");
         if (lastDotIndex < 0) {
             throw new ExtensionNotFoundException("파일 확장자를 찾을 수 없습니다. 파일 확장자가 파일 이름에 포함되어야합니다.");

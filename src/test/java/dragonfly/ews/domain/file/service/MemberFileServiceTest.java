@@ -1,6 +1,6 @@
 package dragonfly.ews.domain.file.service;
 
-import dragonfly.ews.domain.file.FileUtils;
+import dragonfly.ews.domain.file.utils.FileUtils;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.file.exception.*;
@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
