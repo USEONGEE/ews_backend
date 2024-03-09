@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberFileLogRepository extends JpaRepository<MemberFileLog, Long> {
-    @Query("SELECT mfl FROM MemberFileLog mfl WHERE mfl.id = :memberFileLogId AND " +
+    @Query("SELECT mfl FROM MemberFileLog mfl join fetch mfl.memberFile WHERE mfl.id = :memberFileLogId AND " +
             "(mfl.memberFile.owner.id = :memberId OR " +
             "mfl.memberFile.project.id IN " +
             "(SELECT pp.project.id FROM ParticipateProject pp WHERE pp.member.id = :memberId))")

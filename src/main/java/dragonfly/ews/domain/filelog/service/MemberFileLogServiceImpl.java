@@ -17,12 +17,24 @@ import java.util.List;
 public class MemberFileLogServiceImpl implements MemberFileLogService {
     private final MemberFileLogRepository memberFileLogRepository;
 
+    /**
+     * [단건 조회]
+     * @param memberId
+     * @param memberFileLogId
+     * @return
+     */
     @Override
     public MemberFileLog findById(Long memberId, Long memberFileLogId) {
         return memberFileLogRepository.findByIdAuth(memberId, memberFileLogId)
                 .orElseThrow(() -> new NoSuchFileException("파일이 존재하지 않습니다."));
     }
 
+    /**
+     * [결과 파일 포함 조회]
+     * @param memberId
+     * @param memberFileLogId
+     * @return
+     */
     @Override
     public MemberFileLog findByIdContainResults(Long memberId, Long memberFileLogId) {
         memberFileLogRepository.findByIdAuth(memberId, memberFileLogId)
@@ -31,6 +43,12 @@ public class MemberFileLogServiceImpl implements MemberFileLogService {
                 .orElseThrow(() -> new NoSuchFileException("파일이 존재하지 않습니다."));
     }
 
+    /**
+     * [전체 조회 - 페이징]
+     * @param memberId
+     * @param pageable
+     * @return
+     */
     @Override
     public Page<MemberFileLog> findPaging(Long memberId, Pageable pageable) {
         return memberFileLogRepository.findByOwnerId(memberId, pageable);

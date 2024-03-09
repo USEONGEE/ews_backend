@@ -1,7 +1,7 @@
 package dragonfly.ews.domain.file.aop.utils;
 
 
-import dragonfly.ews.domain.base.aop.strategy.MemberFileStrategy;
+import dragonfly.ews.domain.file.aop.strategy.MemberFileStrategy;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.member.domain.Member;
@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 
-// TODO UserFileStategy를 통해 전략 주입을 하지 않았으면은 MemberFileManager를 사용하면 안 됨
+// TODO UseMemberFileStrategy 통해 전략 주입을 하지 않았으면은 MemberFileManager를 사용하면 안 됨
 public class MemberFileManagerImpl implements MemberFileManager, MemberFileManagerConfig {
     private final ThreadLocal<MemberFileStrategy> fileStrategy = new ThreadLocal<>();
 

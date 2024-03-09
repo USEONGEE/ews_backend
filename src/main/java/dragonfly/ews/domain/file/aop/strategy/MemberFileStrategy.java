@@ -1,6 +1,7 @@
-package dragonfly.ews.domain.base.aop.strategy;
+package dragonfly.ews.domain.file.aop.strategy;
 
 
+import dragonfly.ews.domain.base.aop.strategy.Strategy;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.member.domain.Member;

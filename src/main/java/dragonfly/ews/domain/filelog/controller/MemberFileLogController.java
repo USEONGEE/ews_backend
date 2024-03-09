@@ -36,7 +36,7 @@ public class MemberFileLogController {
      * @param member
      * @return
      */
-    @GetMapping("/data/{memberFileLogId}")
+    @GetMapping("/data/{memberFileLogId}/excel")
     public ResponseEntity<SuccessResponse> fetchUserFileContent(
             @PathVariable(value = "memberFileLogId") Long memberFileLogId,
             @AuthenticationPrincipal(expression = "member") Member member) {

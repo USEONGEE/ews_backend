@@ -48,7 +48,7 @@ class AnalysisResultRepositoryTest {
         em.flush();
         em.clear();
 
-        AnalysisResult findResult = analysisResultRepository.findResultFileByIdAuth(member.getId(),
+        AnalysisResult findResult = analysisResultRepository.findByIdAuth(member.getId(),
                 analysisResult.getId()).orElse(null);
         assertThat(findResult).isNotNull();
     }
@@ -67,7 +67,7 @@ class AnalysisResultRepositoryTest {
         em.flush();
         em.clear();
 
-        AnalysisResult findResult = analysisResultRepository.findResultFileByIdAuth(anotherMember.getId(),
+        AnalysisResult findResult = analysisResultRepository.findByIdAuth(anotherMember.getId(),
                 analysisResult.getId()).orElse(null);
 
         assertThat(findResult).isNull();

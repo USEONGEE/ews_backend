@@ -1,7 +1,7 @@
 package dragonfly.ews.domain.file.aop.aspect;
 
 import dragonfly.ews.domain.file.utils.FileUtils;
-import dragonfly.ews.domain.base.aop.strategy.MemberFileStrategy;
+import dragonfly.ews.domain.file.aop.strategy.MemberFileStrategy;
 import dragonfly.ews.domain.file.aop.utils.MemberFileManagerConfig;
 import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;

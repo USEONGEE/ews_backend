@@ -1,4 +1,4 @@
-package dragonfly.ews.domain.base.aop.strategy;
+package dragonfly.ews.domain.file.aop.strategy;
 
 import dragonfly.ews.domain.file.utils.FileUtils;
 import dragonfly.ews.domain.file.domain.ExcelFileColumn;
@@ -29,7 +29,7 @@ import static dragonfly.ews.domain.file.domain.FileExtension.*;
 
 @Component
 @RequiredArgsConstructor
-public class ExcelStrategy implements MemberFileStrategy {
+public class ExcelMemberFileStrategy implements MemberFileStrategy {
     private final FileUtils memberFileUtils;
     private final ExcelFileReader excelFileReader;
     private final ExcelMemberFileRepository excelMemberFileRepository;
