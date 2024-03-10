@@ -4,6 +4,8 @@ import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
 import dragonfly.ews.domain.result.dto.AnalysisStatusResponseDto;
+import dragonfly.ews.domain.result.dto.AnalysisExcelFileColumnDto;
+import dragonfly.ews.domain.result.dto.UserAnalysisRequestDto;
 import dragonfly.ews.domain.result.service.AnalysisResultService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,18 +48,16 @@ public class AnalysisResultController {
     /**
      * [파일 분석 요청]
      *
-     * @param memberFileLodId
      * @param member
      * @return
      */
-    @PostMapping("/{memberFileLodId}")
+    @PostMapping
     public ResponseEntity<SuccessResponse> analysis(
-            @PathVariable("fileAnalysisId") Long memberFileLodId,
+            @RequestBody UserAnalysisRequestDto userAnalysisRequestDto,
             @AuthenticationPrincipal(expression = "member") Member member) {
-        AnalysisResult analysisResult = analysisResultService.createAnalysisResult(member.getId(),
-                memberFileLodId);
-        return new ResponseEntity<>(SuccessResponse.of(analysisResultService.analysis(member.getId(),
-                analysisResult.getId())), HttpStatus.OK);
+        AnalysisResult analysis = analysisResultService.analysis(member.getId(),
+                userAnalysisRequestDto);
+        return new ResponseEntity<>(SuccessResponse.of(analysis.getId()), HttpStatus.OK);
     }
 
     /**

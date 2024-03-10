@@ -1,5 +1,6 @@
 package dragonfly.ews.domain.file.repository;
 
+import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,4 +31,7 @@ public interface MemberFileRepository extends JpaRepository<MemberFile, Long> {
     @Query("select mf from MemberFile mf where mf.owner.id = :ownerId and mf.id = :fileId")
     Optional<MemberFile> findByIdAndOwnerId(@Param("ownerId") Long ownerId,
                                             @Param("fileId") Long memberFileId);
+
+    @Query("select mf.fileExtension from MemberFile mf join mf.memberFileLogs mfl where mfl.id = :memberFileLogId")
+    Optional<FileExtension> findExtensionByMemberFileLogId(@Param("memberFileLogId") Long memberFileLogId);
 }

@@ -31,7 +31,7 @@ public class MemberFileLogStrategyAspect {
      * @param joinPoint
      */
     // TODO 현재 args() 표현식이 적용이 안되어서 if문으로 해결함. 나중에 수정해야함
-    @Before("@annotation(dragonfly.ews.domain.flelog.aop.annotation.UseMemberFileLogManager)")
+    @Before("@annotation(dragonfly.ews.domain.filelog.aop.annotation.UseMemberFileLogManager)")
     public void setFileStrategyForFindById(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         if (args[0] instanceof Long && args[0] instanceof Long) {
@@ -48,7 +48,7 @@ public class MemberFileLogStrategyAspect {
      *
      * @param joinPoint
      */
-    @After("@annotation(dragonfly.ews.domain.flelog.aop.annotation.UseMemberFileLogManager)")
+    @After("@annotation(dragonfly.ews.domain.filelog.aop.annotation.UseMemberFileLogManager)")
     public void removeStrategy(JoinPoint joinPoint) {
         fileManagerConfig.removeStrategy();
     }
