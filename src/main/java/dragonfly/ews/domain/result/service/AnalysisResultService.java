@@ -1,9 +1,12 @@
 package dragonfly.ews.domain.result.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.file.domain.ExcelFileColumn;
 import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.repository.ExcelFileColumnRepository;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
+import dragonfly.ews.domain.file.utils.FileUtils;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.exception.NoSuchMemberFileLogException;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
@@ -17,9 +20,12 @@ import dragonfly.ews.domain.result.exceptioon.NotCompletedException;
 import dragonfly.ews.domain.result.repository.AnalysisResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
@@ -46,6 +52,8 @@ public class AnalysisResultService {
     private final WebClient webClient;
     private final AnalysisResultProcessor analysisResultProcessor;
     private final MemberFileRepository memberFileRepository;
+    private final ObjectMapper objectMapper;
+    private final FileUtils fileUtils;
     @Value("${file.dir}")
     private String fileDir;
 
@@ -61,12 +69,13 @@ public class AnalysisResultService {
      * @return
      */
     @Transactional
+    @LogMethodParams
     public AnalysisResult analysis(Long memberId, UserAnalysisRequestDto userAnalysisRequestDto) {
         // 분석 파일 로그 조회
         MemberFileLog memberFileLog = memberFileLogRepository.findByIdAuth(memberId, userAnalysisRequestDto.getMemberFileLodId())
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
         AnalysisResult analysisResult = new AnalysisResult(memberFileLog, AnalysisStatus.CREATED);
-        
+
         // 파일 상태 조회
         validateFileAnalysisStatus(analysisResult);
 
@@ -81,20 +90,37 @@ public class AnalysisResultService {
             analysisRequestDto.setColumns(fetchColumnDtos(userAnalysisRequestDto.getSelectedColumnIds()));
         }
 
-        // 파일 가져오기
-        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part("file", new FileSystemResource(fileDir + memberFileLog.getSavedName()));
-        multipartBodyBuilder.part("metadata", analysisRequestDto);
-        MultiValueMap<String, HttpEntity<?>> multipartBody = multipartBodyBuilder.build();
+        // 파일 내용 JSON 문자열로 파싱
+        String json = null;
+        try {
+            json = objectMapper.writeValueAsString(analysisRequestDto);
+            System.out.println(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        System.out.println(analysisServerUri + analysisUri);
+        // 파일 내용 가져오기
+        byte[] content = fileUtils.readFileContentByPath(fileDir + memberFileLog.getSavedName());
+        ByteArrayResource byteArrayResource = new ByteArrayResource(content) {
+            @Override
+            public String getFilename() {
+                return memberFileLog.getSavedName(); // 파일 이름(확장자 포함)을 반환
+            }
+        };
+
+        // 파일 가져오기
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", byteArrayResource);
+        builder.part("metadata", json);
+        MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
+
 
         // 비동기 요청 보내기
         // HTML 파일은 분석 서버에서 "문자열"로 반환함
         webClient.post()
                 .uri(analysisServerUri + analysisUri)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(multipartBody))
+                .bodyValue(multipartBody)
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(result ->
