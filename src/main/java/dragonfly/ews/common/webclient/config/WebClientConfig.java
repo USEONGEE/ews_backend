@@ -38,8 +38,8 @@ public class WebClientConfig {
     public WebClient commonWebClient(HttpClient httpClient) {
         return WebClient
                 .builder()
-                .filter(logRequest())
-                .filter(logResponse())
+//                .filter(logRequest())
+//                .filter(logResponse())
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();

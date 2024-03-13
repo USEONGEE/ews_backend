@@ -4,7 +4,9 @@ spring:
       ddl-auto: update
       format_sql: true
   #    show-sql: true
-
+  mvc:
+    media-types:
+      csv: text/csv
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:tcp://localhost/~/ews
@@ -51,3 +53,4 @@ analysis:
     url: http://localhost:8000/
     analysis-uri: files/analyze/
     column-check-uri: /column-check
+

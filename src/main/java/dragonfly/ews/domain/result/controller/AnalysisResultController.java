@@ -62,6 +62,7 @@ public class AnalysisResultController {
 
     /**
      * [분석된 파일을 응답]
+     *
      * @param fileAnalysisId
      * @param member
      * @return
@@ -74,7 +75,7 @@ public class AnalysisResultController {
                 fileAnalysisId);
         try {
             UrlResource resource = new UrlResource(fileDir + analysisResult.getSavedName());
-            if(resource.exists() || resource.isReadable()) {
+            if (resource.exists() || resource.isReadable()) {
                 return ResponseEntity.ok()
                         .contentType(MediaType.TEXT_HTML) // HTML 파일의 MIME 타입
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
@@ -86,4 +87,5 @@ public class AnalysisResultController {
             throw new RuntimeException("Error: " + e.getMessage());
         }
     }
+
 }

@@ -1,10 +1,12 @@
 package dragonfly.ews.domain.file.utils;
 
+import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.exception.CannotReadFileException;
 import dragonfly.ews.domain.file.exception.CannotSaveFileException;
 import dragonfly.ews.domain.file.exception.ExtensionNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,6 +49,25 @@ public class FileUtils {
             log.error("파일 저장에 문제가 발생했습니다.");
             throw new CannotSaveFileException(e);
         }
+    }
+
+    public MediaType getMediaTypeFrom(String filename) {
+        String extension = extractFileExtension(filename);
+        FileExtension ext = FileExtension.fromString(extension);
+        switch (ext) {
+            case CSV:
+                return new MediaType("text", "csv");
+            case XLSX:
+                return MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            case XLS:
+                return MediaType.parseMediaType("application/vnd.ms-excel");
+            default:
+                throw new IllegalArgumentException("해당 확장자의 MediaType을 얻을 수 없습니다.");
+        }
+    }
+
+    public String getFullPath(String filename) {
+        return fileDir + filename;
     }
 
     public byte[] readFileContentByPath(String path) {

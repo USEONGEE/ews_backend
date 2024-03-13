@@ -20,7 +20,7 @@ public class RestExceptionHandler {
 //            code = errorCode.getHttpStatus();
 //        }
 
-        log.warn("[WARN] " + e.getMessage());
+            log.warn("[WARN] " + e.getMessage());
 
         return ResponseEntity.status(code)
                 .body(ErrorResponse.of(code, "오류가 발생하였습니다.", e.getMessage()));
