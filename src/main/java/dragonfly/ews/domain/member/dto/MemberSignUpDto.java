@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * [회원 가입]
+ */
 @NoArgsConstructor
 @Data
 public class MemberSignUpDto {

@@ -30,24 +30,6 @@ public class MemberFileLogController {
     private final ExcelFileReader fileReadManager;
 
     /**
-     * [파일로그의 엑셀 데이터를 일부 조회]
-     *
-     * @param memberFileLogId
-     * @param member
-     * @return
-     */
-    @GetMapping("/data/{memberFileLogId}/excel")
-    public ResponseEntity<SuccessResponse> fetchUserFileContent(
-            @PathVariable(value = "memberFileLogId") Long memberFileLogId,
-            @AuthenticationPrincipal(expression = "member") Member member) {
-        MemberFileLog memberFileLog = memberFileLogService.findById(member.getId(), memberFileLogId);
-        String savedName = memberFileLog.getSavedName();
-        ExcelDataDto excelDataDto = (ExcelDataDto) fileReadManager.read(fileDir + savedName);
-
-        return new ResponseEntity<>(SuccessResponse.of(excelDataDto), HttpStatus.OK);
-    }
-
-    /**
      * [파일로그 세부 조회]
      *
      * @param memberFileLogId

@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * [ExcelFileColumn Entity를 생성하기 위한 DTO]
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

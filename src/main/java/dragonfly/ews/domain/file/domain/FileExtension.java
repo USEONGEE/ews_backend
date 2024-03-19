@@ -1,5 +1,8 @@
 package dragonfly.ews.domain.file.domain;
 
+/**
+ * [사용자가 저장한 파일의 확장자]
+ */
 public enum FileExtension {
     CSV, XLSX, XLS;
 

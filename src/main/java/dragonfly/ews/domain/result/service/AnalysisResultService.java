@@ -66,6 +66,8 @@ public class AnalysisResultService {
      * @return
      */
     // TODO ExcelAnalysisResultService 으로 옮기는 것을 고려해야함
+    // TODO MemberFileLog가 ExcelMemberFileLog 라면 ExcelFileColumn을 갖고 있기 때문에 한방 쿼리로 가능
+    // TODO 분석 요청을 보낸 후에 그냥 끊고, 분석 서버에서 현재 서버에 POST 요청을 보내도록
     @Transactional
     @LogMethodParams
     public AnalysisResult analysis(Long memberId, UserAnalysisRequestDto userAnalysisRequestDto) {

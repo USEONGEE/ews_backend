@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * [MemberFile 엔티티와 그 로그들을 출력하는 DTO]
+ * <br/> - MemgberFileLog는 abstract class 이므로 더 자세한 정보를 위해서는 더 자세한 DTO가 필요하다.
+ */
 @Data
 @NoArgsConstructor
 public class MemberFileContainLogsResponseDto {

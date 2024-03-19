@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * [MemberFile Entity 기본 응답]
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

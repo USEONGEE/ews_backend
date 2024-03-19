@@ -4,20 +4,25 @@ import dragonfly.ews.domain.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+/**
+ * [다른 회원이 조회하는 정보]
+ */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class MemberResponseDto {
-    String nickname;
-    String email;
+    private Long id;
+    private String email;
+    private String nickname;
+    private String imageName;
 
     public static MemberResponseDto of(Member member) {
         return MemberResponseDto.builder()
-                .nickname(member.getNickname())
+                .id(member.getId())
                 .email(member.getEmail())
+                .nickname(member.getNickname())
+                .imageName(member.getImageName())
                 .build();
     }
 }

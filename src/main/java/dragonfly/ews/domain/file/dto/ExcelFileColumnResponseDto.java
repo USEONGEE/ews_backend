@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * [ExcelMemberFilelog 가 가진 Column을 반환하기 위한 DTO]
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

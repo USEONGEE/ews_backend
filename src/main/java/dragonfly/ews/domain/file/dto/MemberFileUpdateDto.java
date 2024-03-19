@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * [MemberFile 을 Update하기 위한 Dto]
+ */
 @Data
 @NoArgsConstructor
 @ToString

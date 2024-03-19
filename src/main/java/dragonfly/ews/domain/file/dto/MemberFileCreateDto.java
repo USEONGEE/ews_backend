@@ -3,6 +3,9 @@ package dragonfly.ews.domain.file.dto;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * [MemberFile Entity 생성]
+ */
 @Data
 @NoArgsConstructor
 @ToString

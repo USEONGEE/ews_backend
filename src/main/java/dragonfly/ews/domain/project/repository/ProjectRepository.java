@@ -1,5 +1,6 @@
 package dragonfly.ews.domain.project.repository;
 
+import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,4 +20,5 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("select p from Project p left join fetch p.memberFiles mf where p.id = :projectId and p.owner.id = :ownerId")
     Optional<Project> findByIdAndOwnerId(@Param("projectId") Long projectId, @Param("ownerId") Long ownerId);
+
 }

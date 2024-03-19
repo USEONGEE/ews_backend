@@ -2,12 +2,11 @@ package dragonfly.ews.domain.member.repository;
 
 import dragonfly.ews.domain.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
 
@@ -17,5 +16,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findByIdIn(List<Long> ids);
 
+    List<Member> findByEmailContaining(String emailFragment);
 
+    @Query("SELECT pp.member FROM ParticipateProject pp WHERE pp.project.id = :projectId")
+    List<Member> findByProjectId(Long projectId);
 }

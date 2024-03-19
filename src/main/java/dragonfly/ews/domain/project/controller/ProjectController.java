@@ -2,6 +2,7 @@ package dragonfly.ews.domain.project.controller;
 
 import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
+import dragonfly.ews.domain.member.dto.MemberResponseDto;
 import dragonfly.ews.domain.project.domain.Project;
 import dragonfly.ews.domain.project.dto.AddParticipantsDto;
 import dragonfly.ews.domain.project.dto.ParticipantDto;
@@ -69,12 +70,31 @@ public class ProjectController {
         return new ResponseEntity<>(SuccessResponse.of(result), HttpStatus.OK);
     }
 
+    /**
+     * [프로젝트 조회]
+     *
+     * @param member
+     * @param projectId
+     * @return
+     */
     @GetMapping("/{projectId}")
     public ResponseEntity<SuccessResponse> findOne(
             @AuthenticationPrincipal(expression = "member") Member member,
             @PathVariable(value = "projectId") Long projectId) {
         return new ResponseEntity<>(SuccessResponse.of(new ProjectResponseDto(projectService.findOne(member.getId(), projectId))),
                 HttpStatus.OK);
+    }
+
+    @GetMapping("/{projectId}/participate")
+    public ResponseEntity<SuccessResponse> findParticipates(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @PathVariable(value = "projectId") Long projectId
+    ) {
+        List<MemberResponseDto> dtos = projectService.findParticipates(member.getId(), projectId)
+                .stream()
+                .map(MemberResponseDto::of)
+                .toList();
+        return new ResponseEntity<>(SuccessResponse.of(dtos), HttpStatus.OK);
     }
 
     @DeleteMapping("/{projectId}")
