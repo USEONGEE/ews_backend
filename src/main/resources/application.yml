@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       format_sql: true
   #    show-sql: true
   mvc:
@@ -28,6 +28,10 @@ spring:
 logging:
   level:
     org:
+      springframework:
+#        web: DEBUG
+#        security: DEBUG
+
       hibernate:
         SQL: debug
         type:
@@ -50,7 +54,7 @@ file:
 
 analysis:
   server:
-    url: http://localhost:8000/
+    url: http://localhost:80/
     analysis-uri: files/analyze/
     column-check-uri: /column-check
 

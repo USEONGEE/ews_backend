@@ -1,7 +1,8 @@
-package dragonfly.ews.domain.file.domain;
+package dragonfly.ews.domain.filelog.domain;
 
 import dragonfly.ews.domain.base.BaseTimeEntity;
 import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
+import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,8 +22,9 @@ public class ExcelFileColumn extends BaseTimeEntity {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "excel_file_id")
-    private ExcelMemberFile excelMemberFile;
+    @JoinColumn(name = "excel_memberfile_log_id")
+    private ExcelMemberFileLog excelMemberFileLog;
+
 
     public ExcelFileColumn(ExcelFileColumnCreateDto excelFileColumnCreateDto) {
         this.columnName = excelFileColumnCreateDto.getColumnName();

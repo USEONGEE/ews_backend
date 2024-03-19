@@ -8,6 +8,7 @@ import dragonfly.ews.common.security.handler.LoginSuccessHandler;
 import dragonfly.ews.common.security.handler.OAuth2LoginSuccessHandler;
 import dragonfly.ews.common.security.service.JwtService;
 import dragonfly.ews.common.security.service.LoginService;
+import dragonfly.ews.common.security.service.WhiteList;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -46,7 +47,7 @@ public class SecurityConfig {
         http.headers(config -> config.frameOptions(config2 -> config2.disable()));
         http.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(config ->
-                config.requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**", "/member/sign-up").permitAll()
+                config.requestMatchers(WhiteList.WHITE_LIST_ARRAY).permitAll()
                         .anyRequest().hasAuthority("ROLE_USER"));
 
         // 원래 스프링 시큐리티 필터 순서가 LogoutFilter 이후에 로그인 필터 동작
@@ -55,11 +56,13 @@ public class SecurityConfig {
         http.addFilter(corsConfig.corsFilter());
         http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
         http.addFilterBefore(jwtAuthenticationProcessingFilter(), CustomJsonUsernamePasswordAuthenticationFilter.class);
-        http.oauth2Login(config -> {
-            config.defaultSuccessUrl("/");
-            config.successHandler(oAuth2LoginSuccessHandler);
-            config.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(defaultOAuth2UserService));
-        });
+
+        // oauth
+//        http.oauth2Login(config -> {
+//            config.defaultSuccessUrl("/");
+//            config.successHandler(oAuth2LoginSuccessHandler);
+//            config.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(defaultOAuth2UserService));
+//        });
         return http.build();
     }
 

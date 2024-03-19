@@ -3,6 +3,7 @@ package dragonfly.ews.common.security.filter;
 import dragonfly.ews.common.security.auth.PrincipalDetails;
 import dragonfly.ews.common.security.service.JwtService;
 import dragonfly.ews.common.security.service.PasswordUtil;
+import dragonfly.ews.common.security.service.WhiteList;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
@@ -17,6 +18,7 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -25,21 +27,18 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
-
-    private static final String NO_CHECK_URL = "/login"; // "/login"으로 들어오는 요청은 Filter 작동 X
-
     private final JwtService jwtService;
     private final MemberRepository memberRepository;
+    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
-            filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
+        if (isPass(request)) {
+            filterChain.doFilter(request, response);
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
-
         // 사용자 요청 헤더에서 RefreshToken 추출
         // -> RefreshToken이 없거나 유효하지 않다면(DB에 저장된 RefreshToken과 다르다면) null을 반환
         // 사용자의 요청 헤더에 RefreshToken이 있는 경우는, AccessToken이 만료되어 요청한 경우밖에 없다.
@@ -147,5 +146,15 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.info("JwtAuthenticationProcessingFilter.saveAuthentication");
+    }
+
+    private boolean isPass(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        for (String pattern : WhiteList.WHITE_LIST_ARRAY) {
+            if (pathMatcher.match(pattern, requestURI)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

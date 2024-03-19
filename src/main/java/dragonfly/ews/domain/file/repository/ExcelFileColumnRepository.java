@@ -1,8 +1,7 @@
 package dragonfly.ews.domain.file.repository;
 
 
-import dragonfly.ews.domain.file.domain.ExcelFileColumn;
-import jakarta.persistence.Column;
+import dragonfly.ews.domain.filelog.domain.ExcelFileColumn;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

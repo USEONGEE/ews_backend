@@ -1,5 +1,6 @@
 package dragonfly.ews.domain.result.domain;
 
+import dragonfly.ews.domain.base.BaseTimeEntity;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,11 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AnalysisResult {
+@Inheritance(strategy = InheritanceType.JOINED)
+public class AnalysisResult extends BaseTimeEntity {
     @Id
     @GeneratedValue
     @Column(name = "analysis_result_id")
@@ -20,7 +25,12 @@ public class AnalysisResult {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_log_id")
     private MemberFileLog memberFileLog;
-    private String savedName;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisResult")
+    private List<AnalysisResultFile> analysisResultFiles = new ArrayList<>();
+
+    @Lob
+    private String description;
 
     // 분석 상태
     @Enumerated(EnumType.STRING)
@@ -28,18 +38,17 @@ public class AnalysisResult {
 
     public AnalysisResult(MemberFileLog memberFileLog, AnalysisStatus analysisStatus) {
         addMemberFileLog(memberFileLog);
-        this.analysisStatus = analysisStatus;
+        setAnalysisStatus(analysisStatus);
     }
 
-    /**
-     * [결과 파일명 저장]
-     * <p/> 외부 서버에서 분석 결과를 받은 후, 파일을 저장.
-     * <br/> 파일을 저장하면은 자동으로 분석 상태는 COMPLETE 로 변경
-     * @param savedName
-     */
-    public void changeSavedName(String savedName) {
-        changeAnalysisStatus(AnalysisStatus.COMPLETED);
-        setSavedName(savedName);
+    public void addResultFile(String filename, String savedFilename) {
+        AnalysisResultFile analysisResultFile = new AnalysisResultFile(this, filename, savedFilename);
+        this.analysisResultFiles.add(analysisResultFile);
+    }
+
+    public void addResultFile(String savedFilename) {
+        AnalysisResultFile analysisResultFile = new AnalysisResultFile(this, savedFilename);
+        this.analysisResultFiles.add(analysisResultFile);
     }
 
     public void changeAnalysisStatus(AnalysisStatus status) {
@@ -47,8 +56,12 @@ public class AnalysisResult {
     }
 
     // == 연관관계 편의 메소드
-    private void addMemberFileLog(MemberFileLog memberFileLog) {
+    protected void addMemberFileLog(MemberFileLog memberFileLog) {
         memberFileLog.getAnalysisResults().add(this);
         setMemberFileLog(memberFileLog);
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
     }
 }

@@ -72,7 +72,7 @@ public class MemberFileStrategyAspect {
     @Before("@annotation(dragonfly.ews.domain.file.aop.annotation.UseMemberFileManager)")
     public void setFileStrategyForFindById(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
-        if (args[0] instanceof Long && args[0] instanceof Long) {
+        if (args[0] instanceof Long && args[1] instanceof Long) {
             MemberFile memberFile = memberFileRepository.findByIdAuth((Long) args[0], (Long) args[1])
                     .orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다."));
 

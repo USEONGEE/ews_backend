@@ -2,7 +2,7 @@ package dragonfly.ews.domain.result.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dragonfly.ews.develop.aop.LogMethodParams;
-import dragonfly.ews.domain.file.domain.ExcelFileColumn;
+import dragonfly.ews.domain.filelog.domain.ExcelFileColumn;
 import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.repository.ExcelFileColumnRepository;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
@@ -12,18 +12,18 @@ import dragonfly.ews.domain.filelog.exception.NoSuchMemberFileLogException;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
+import dragonfly.ews.domain.result.domain.ExcelAnalysisResult;
 import dragonfly.ews.domain.result.dto.AnalysisExcelFileColumnDto;
-import dragonfly.ews.domain.result.dto.AnalysisRequestDto;
+import dragonfly.ews.domain.result.dto.ExcelFileAnalysisRequestDto;
 import dragonfly.ews.domain.result.dto.UserAnalysisRequestDto;
-import dragonfly.ews.domain.result.exceptioon.CannotProcessAnalysisException;
 import dragonfly.ews.domain.result.exceptioon.NotCompletedException;
+import dragonfly.ews.domain.result.postprocessor.AnalysisPostProcessor;
 import dragonfly.ews.domain.result.repository.AnalysisResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -48,7 +47,7 @@ public class AnalysisResultService {
     private final MemberFileLogRepository memberFileLogRepository;
     private final AnalysisResultRepository analysisResultRepository;
     private final WebClient webClient;
-    private final AnalysisResultProcessor analysisResultProcessor;
+    private final AnalysisPostProcessor analysisPostProcessor;
     private final MemberFileRepository memberFileRepository;
     private final ObjectMapper objectMapper;
     private final FileUtils fileUtils;
@@ -66,26 +65,37 @@ public class AnalysisResultService {
      * @param memberId
      * @return
      */
+    // TODO ExcelAnalysisResultService 으로 옮기는 것을 고려해야함
     @Transactional
     @LogMethodParams
     public AnalysisResult analysis(Long memberId, UserAnalysisRequestDto userAnalysisRequestDto) {
         // 분석 파일 로그 조회
-        MemberFileLog memberFileLog = memberFileLogRepository.findByIdAuth(memberId, userAnalysisRequestDto.getMemberFileLodId())
+        MemberFileLog memberFileLog = memberFileLogRepository.findByIdAuth(memberId, userAnalysisRequestDto.getMemberFileLogId())
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
-        AnalysisResult analysisResult = new AnalysisResult(memberFileLog, AnalysisStatus.CREATED);
-
-        // 파일 상태 조회
-        validateFileAnalysisStatus(analysisResult);
+        AnalysisResult analysisResult = new ExcelAnalysisResult(memberFileLog, AnalysisStatus.PROCESSING);
+        analysisResult.changeDescription(userAnalysisRequestDto.getDescription());
 
         // 요청 메타데이터 생성
         FileExtension extension = memberFileRepository.findExtensionByMemberFileLogId(
-                userAnalysisRequestDto.getMemberFileLodId()
+                userAnalysisRequestDto.getMemberFileLogId()
         ).orElseThrow(NoSuchMemberFileLogException::new);
-        AnalysisRequestDto analysisRequestDto = new AnalysisRequestDto(extension,
-                null,
+        ExcelFileAnalysisRequestDto analysisRequestDto = new ExcelFileAnalysisRequestDto(extension,
                 userAnalysisRequestDto.isAll());
+
+        // column 추가
         if (!userAnalysisRequestDto.isAll()) {
-            analysisRequestDto.setColumns(fetchColumnDtos(userAnalysisRequestDto.getSelectedColumnIds()));
+            List<AnalysisExcelFileColumnDto> analysisExcelFileColumnDtos
+                    = fetchColumnDtos(userAnalysisRequestDto.getSelectedColumnIds());
+            for (AnalysisExcelFileColumnDto analysisExcelFileColumnDto : analysisExcelFileColumnDtos) {
+                analysisRequestDto.addColumns(analysisExcelFileColumnDto);
+            }
+        }
+
+        // targetColumn 추가
+        List<AnalysisExcelFileColumnDto> analysisExcelFileColumnDtos
+                = fetchColumnDtos(userAnalysisRequestDto.getTargetColumnIds());
+        for (AnalysisExcelFileColumnDto analysisExcelFileColumnDto : analysisExcelFileColumnDtos) {
+            analysisRequestDto.addTargetColumns(analysisExcelFileColumnDto);
         }
 
         // 파일 내용 JSON 문자열로 파싱
@@ -114,8 +124,9 @@ public class AnalysisResultService {
                 .body(BodyInserters.fromMultipartData(multipartBody))
                 .retrieve()
                 .bodyToMono(String.class)
+                .doOnError(error -> analysisPostProcessor.fail((Exception) error, analysisResult.getId()))
                 .subscribe(result ->
-                        analysisResultProcessor.processResult((String) result, (Long) analysisResult.getId()));
+                        analysisPostProcessor.success(result, analysisResult.getId()));
 
         analysisResult.changeAnalysisStatus(AnalysisStatus.PROCESSING);
         return analysisResult;
@@ -172,11 +183,5 @@ public class AnalysisResultService {
                 .toList();
     }
 
-    private void validateFileAnalysisStatus(AnalysisResult analysisResult) {
-        switch (analysisResult.getAnalysisStatus()) {
-            case CANCELED -> throw new CannotProcessAnalysisException("분석 요청이 취소된 파일입니다. 관리자에게 문의하세요");
-            case PROCESSING -> throw new CannotProcessAnalysisException("이미 분석 중인 파일입니다.");
-            case COMPLETED -> throw new CannotProcessAnalysisException("이미 분석된 파일입니다.");
-        }
-    }
+
 }

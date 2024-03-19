@@ -50,6 +50,12 @@ public class MemberServiceImpl implements MemberService{
         return true;
     }
 
+    @Override
+    public Member findOne(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(NoSuchMemberException::new);
+    }
+
     private void signUpValidation(MemberSignUpDto userSignUpDto) {
         if (memberRepository.findByEmail(userSignUpDto.getEmail()).isPresent()) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");

@@ -139,14 +139,4 @@ public class MemberFile extends BaseEntity {
         return getFileExtension() == FileExtension.fromString(extension);
     }
 
-    /**
-     * [MemberFileLog 주입하기]
-     * 2번의 컬렉션 조인이 불가능하기에 컬렉션을 주입하기 위해 사용
-     * @param memberFileLogs
-     */
-    public void injectMemberFileLogs(List<MemberFileLog> memberFileLogs) {
-        this.memberFileLogs = memberFileLogs;
-    }
-    
-
 }

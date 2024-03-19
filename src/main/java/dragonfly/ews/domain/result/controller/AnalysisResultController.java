@@ -1,12 +1,16 @@
 package dragonfly.ews.domain.result.controller;
 
 import dragonfly.ews.common.handler.SuccessResponse;
+import dragonfly.ews.domain.file.exception.NoSuchFileException;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
+import dragonfly.ews.domain.result.domain.AnalysisResultFile;
 import dragonfly.ews.domain.result.dto.AnalysisStatusResponseDto;
 import dragonfly.ews.domain.result.dto.AnalysisExcelFileColumnDto;
 import dragonfly.ews.domain.result.dto.UserAnalysisRequestDto;
+import dragonfly.ews.domain.result.repository.AnalysisResultFileRepository;
 import dragonfly.ews.domain.result.service.AnalysisResultService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
@@ -25,6 +29,7 @@ import java.util.List;
 @RequestMapping("/analysis")
 public class AnalysisResultController {
     private final AnalysisResultService analysisResultService;
+    private final AnalysisResultFileRepository analysisResultFileRepository;
     @Value("${file.dir}")
     private String fileDir;
 
@@ -53,7 +58,7 @@ public class AnalysisResultController {
      */
     @PostMapping
     public ResponseEntity<SuccessResponse> analysis(
-            @RequestBody UserAnalysisRequestDto userAnalysisRequestDto,
+            @RequestBody @Valid UserAnalysisRequestDto userAnalysisRequestDto,
             @AuthenticationPrincipal(expression = "member") Member member) {
         AnalysisResult analysis = analysisResultService.analysis(member.getId(),
                 userAnalysisRequestDto);
@@ -61,20 +66,22 @@ public class AnalysisResultController {
     }
 
     /**
-     * [분석된 파일을 응답]
-     *
-     * @param fileAnalysisId
+     * [분석된 파일 응답]
+     * @param analysisResultFileId
      * @param member
      * @return
      */
-    @GetMapping("/{fileAnalysisId}")
+    @GetMapping("/{analysisResultFileId}")
     public ResponseEntity downloadAnalysisFile(
-            @PathVariable("fileAnalysisId") Long fileAnalysisId,
+            @PathVariable("analysisResultFileId") Long analysisResultFileId,
             @AuthenticationPrincipal(expression = "member") Member member) {
-        AnalysisResult analysisResult = analysisResultService.findCompletedFileById(member.getId(),
-                fileAnalysisId);
+
+        // TODO 인증 기능이 없어서 나중에 인증 기능 추가하자
+        AnalysisResultFile analysisResultFile = analysisResultFileRepository.findById(analysisResultFileId)
+                .orElseThrow(NoSuchFileException::new);
+
         try {
-            UrlResource resource = new UrlResource(fileDir + analysisResult.getSavedName());
+            UrlResource resource = new UrlResource("file:" + fileDir + analysisResultFile.getSavedName());
             if (resource.exists() || resource.isReadable()) {
                 return ResponseEntity.ok()
                         .contentType(MediaType.TEXT_HTML) // HTML 파일의 MIME 타입

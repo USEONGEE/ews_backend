@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// TODO 예외처리 바꾸기
 @Component
 @RequiredArgsConstructor
 public class CsvFileReadProvider implements ExcelFileReadProvider {
@@ -35,11 +34,12 @@ public class CsvFileReadProvider implements ExcelFileReadProvider {
         ExcelDataDto excelDataDto = new ExcelDataDto();
         List<String> columnNames = new ArrayList<>();
         List<ExcelDataDto.ExcelRowDataDto> rows = new ArrayList<>();
+        int rowCount = 0; // 행을 세기 위한 변수
 
         try (BufferedReader br = new BufferedReader(new java.io.FileReader(filePath))) {
             String line;
             boolean isFirstRow = true;
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null && rowCount < 20) { // 조건에 rowCount < 20 추가
                 // CSV 파일의 각 행을 쉼표로 분리
                 List<String> values = Arrays.asList(line.split(","));
 
@@ -52,6 +52,7 @@ public class CsvFileReadProvider implements ExcelFileReadProvider {
                     ExcelDataDto.ExcelRowDataDto rowDataDto = new ExcelDataDto.ExcelRowDataDto();
                     rowDataDto.setData(new ArrayList<>(values)); // 새 리스트로 감싸서 변경 불가능한 리스트 문제 해결
                     rows.add(rowDataDto);
+                    rowCount++; // 행을 세는 변수를 증가
                 }
             }
         } catch (IOException e) {
@@ -63,6 +64,7 @@ public class CsvFileReadProvider implements ExcelFileReadProvider {
         return excelDataDto;
     }
 
+
     @Override
     public List<ExcelFileColumnCreateDto> extractExcelFileColumnCreateDtos(MultipartFile multipartFile) {
         try {
@@ -71,14 +73,14 @@ public class CsvFileReadProvider implements ExcelFileReadProvider {
             String headerLine = fileReader.readLine(); // 첫 번째 줄을 읽어 컬럼 이름을 추출합니다.
             if (headerLine != null) {
                 List<String> columnNames = Arrays.asList(headerLine.split(","));
-                List<String> dataTypes = new ArrayList<>();
+                List<String> dataTypes = new ArrayList<>(); // 데이터 타입을 저장할 리스트를 초기화합니다. (변경되지 않음)
 
                 String firstDataRow = fileReader.readLine(); // 두 번째 줄을 읽어 첫 번째 데이터 행을 추출합니다.
                 if (firstDataRow != null) {
-                    List<String> dataValues = Arrays.asList(firstDataRow.split(","));
+                    List<String> dataValues = new ArrayList<>(Arrays.asList(firstDataRow.split(","))); // 수정된 부분: 수정 가능한 리스트로 변경
                     for (String data : dataValues) {
                         String dataType = dataTypeProvider.determineDataType(data);
-                        dataValues.add(dataType);
+                        dataTypes.add(dataType); // 수정된 부분: 올바른 리스트에 데이터 타입 추가
                     }
 
                     System.out.println("Data Types of the first row: " + dataTypes);
@@ -98,7 +100,7 @@ public class CsvFileReadProvider implements ExcelFileReadProvider {
                 throw new CannotSaveFileException("파일의 데이터가 올바르지 않습니다.");
             }
         } catch (Exception e) {
-            throw new CannotResolveFileReadException("파일을 읽을 수 없습니다.");
+            throw new CannotResolveFileReadException(e);
         }
     }
 }

@@ -19,7 +19,7 @@ public interface MemberFileLogRepository extends JpaRepository<MemberFileLog, Lo
     Optional<MemberFileLog> findByIdAuth(@Param("memberId") Long memberId,
                                          @Param("memberFileLogId") Long memberFileLogId);
 
-    @Query("select mfl from MemberFileLog mfl join fetch mfl.analysisResults far where mfl.id = :memberFileLogId")
+    @Query("select mfl from MemberFileLog mfl left join fetch mfl.analysisResults far where mfl.id = :memberFileLogId")
     Optional<MemberFileLog> findByIdContainResult(@Param("memberFileLogId") Long memberFileLogId);
 
     @Query(value = "select mfl from MemberFileLog mfl left join fetch mfl.memberFile where mfl.memberFile.owner.id = :memberId",

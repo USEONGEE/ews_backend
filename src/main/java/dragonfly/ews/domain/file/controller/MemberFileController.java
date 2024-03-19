@@ -8,6 +8,7 @@ import dragonfly.ews.domain.file.dto.MemberFileResponseDto;
 import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
 import dragonfly.ews.domain.file.service.MemberFileService;
 import dragonfly.ews.domain.member.domain.Member;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +49,7 @@ public class MemberFileController {
      */
     @PostMapping("/update")
     public ResponseEntity<SuccessResponse> updateFile(
-            @ModelAttribute MemberFileUpdateDto memberFileUpdateDto,
+            @ModelAttribute @Valid MemberFileUpdateDto memberFileUpdateDto,
             @AuthenticationPrincipal(expression = "member") Member member) {
         return new ResponseEntity<>(SuccessResponse.of(memberFileService.updateFile(member.getId(),
                 memberFileUpdateDto)), HttpStatus.OK);

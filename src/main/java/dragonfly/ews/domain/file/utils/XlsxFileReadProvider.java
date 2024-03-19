@@ -41,7 +41,7 @@ public class XlsxFileReadProvider implements ExcelFileReadProvider {
             Sheet sheet = workbook.getSheetAt(0);
             boolean isFirstRow = true;
             for (Row row : sheet) {
-                if (row.getRowNum() >= 30) break; // 상위 30열까지만 읽음
+                if (row.getRowNum() >= 20) break; // 상위 30열까지만 읽음
 
                 ExcelDataDto.ExcelRowDataDto rowDataDto = new ExcelDataDto.ExcelRowDataDto();
                 List<String> rowData = new ArrayList<>();

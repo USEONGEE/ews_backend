@@ -62,6 +62,9 @@ public class Project extends BaseEntity {
     public void addMemberFile(@NotNull MemberFile memberFile) {
         memberFile.changeProject(this);
         getMemberFiles().add(memberFile);
+    }
 
+    public void changeDescription(String description) {
+        setDescription(description);
     }
 }

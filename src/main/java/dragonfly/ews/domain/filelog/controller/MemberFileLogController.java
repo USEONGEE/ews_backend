@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/filelog")
-public class    MemberFileLogController {
+public class MemberFileLogController {
     @Value("${file.dir}")
     private String fileDir;
 

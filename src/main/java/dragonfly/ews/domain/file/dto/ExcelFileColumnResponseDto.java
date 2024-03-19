@@ -1,6 +1,6 @@
 package dragonfly.ews.domain.file.dto;
 
-import dragonfly.ews.domain.file.domain.ExcelFileColumn;
+import dragonfly.ews.domain.filelog.domain.ExcelFileColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

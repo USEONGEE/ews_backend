@@ -14,7 +14,9 @@ import dragonfly.ews.domain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * [프로젝트 생성]
+     *
      * @param ownerId
      * @param projectCreateDto
      * @return
@@ -34,6 +37,7 @@ public class ProjectServiceImpl implements ProjectService {
         Member member = memberRepository.findById(ownerId)
                 .orElseThrow(() -> new NoSuchMemberException("회원을 찾을 수 없습니다."));
         Project project = new Project(projectCreateDto.getProjectName(), member);
+        project.changeDescription(projectCreateDto.getDescription());
 
         projectRepository.save(project);
         return project;
@@ -41,6 +45,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * [프로젝트 참여자 생성]
+     *
      * @param ownerId
      * @param projectId
      * @param participantDtos
@@ -51,17 +56,22 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findByIdAuth(ownerId, projectId)
                 .orElseThrow(() -> new NoSuchProjectException("프로젝트를 찾을 수 없습니다."));
 
-        // TODO 1:N 해결하기 -> 한방쿼리 작성
-        for (ParticipantDto participantDto : participantDtos) {
-            Member participant = memberRepository.findById(participantDto.getParticipantId())
-                    .orElseThrow(() -> new NoSuchMemberException("회원을 찾을 수 없습니다."));
-            project.addParticipants(participant);
+        List<Long> collect = Arrays.stream(participantDtos)
+                .sequential()
+                .map(dto -> dto.getParticipantId())
+                .collect(Collectors.toList());
+
+        List<Member> members = memberRepository.findByIdIn(collect);
+        for (Member member : members) {
+            project.addParticipants(member);
         }
+
         return project;
     }
 
     /**
      * [프로젝트에 참여시킬 파일 추가]
+     *
      * @param ownerId
      * @param projectId
      * @param memberFileIds

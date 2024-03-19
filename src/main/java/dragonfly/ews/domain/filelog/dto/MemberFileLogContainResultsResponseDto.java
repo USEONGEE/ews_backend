@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data@NoArgsConstructor
+@Data
+@NoArgsConstructor
 public class MemberFileLogContainResultsResponseDto {
     private Long id;
     private String description;
@@ -26,17 +27,19 @@ public class MemberFileLogContainResultsResponseDto {
         }
     }
 
-    @Data@NoArgsConstructor
-
+    @Data
+    @NoArgsConstructor
     private static class AnalysisResultResponse {
         private Long id;
         private AnalysisStatus status;
+        private String description;
         private LocalDateTime createdDate;
 
         public AnalysisResultResponse(AnalysisResult analysisResult) {
             this.id = analysisResult.getId();
             this.status = analysisResult.getAnalysisStatus();
             this.createdDate = analysisResult.getMemberFileLog().getCreatedDate();
+            this.description = analysisResult.getDescription();
         }
     }
 

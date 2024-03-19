@@ -27,8 +27,6 @@ import java.time.Duration;
 @Configuration
 @Slf4j
 public class WebClientConfig {
-    @Value("${analysis.server.url}")
-    private String baseUrl;
 
     public final ObjectMapper OM = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -38,8 +36,6 @@ public class WebClientConfig {
     public WebClient commonWebClient(HttpClient httpClient) {
         return WebClient
                 .builder()
-//                .filter(logRequest())
-//                .filter(logResponse())
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();

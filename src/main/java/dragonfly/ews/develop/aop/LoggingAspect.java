@@ -26,12 +26,11 @@ public class LoggingAspect {
                 params.append(arg.toString()).append(", ");
             }
         }
+        // 메소드 호출 정보 로깅
+        log.info("Called: {} with params: [{}]", methodName, params.toString());
 
         // 로깅 전에 메소드 실행
         Object result = joinPoint.proceed();
-
-        // 메소드 호출 정보 로깅
-        log.info("Called: {} with params: [{}]", methodName, params.toString());
 
         return result; // 메소드 실행 결과 반환
     }

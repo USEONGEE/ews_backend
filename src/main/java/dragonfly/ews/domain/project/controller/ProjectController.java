@@ -3,6 +3,8 @@ package dragonfly.ews.domain.project.controller;
 import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;
+import dragonfly.ews.domain.project.dto.AddParticipantsDto;
+import dragonfly.ews.domain.project.dto.ParticipantDto;
 import dragonfly.ews.domain.project.dto.ProjectCreateDto;
 import dragonfly.ews.domain.project.dto.ProjectResponseDto;
 import dragonfly.ews.domain.project.service.ProjectService;
@@ -21,7 +23,26 @@ public class ProjectController {
     private final ProjectService projectService;
 
     /**
+     * [프로젝트에 참여자 추가]
+     *
+     * @param member
+     * @param addParticipantsDto
+     * @return
+     */
+    @PostMapping("/participant")
+    public ResponseEntity<SuccessResponse> addParticipant(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @RequestBody AddParticipantsDto addParticipantsDto
+    ) {
+        projectService.addParticipants(member.getId(),
+                addParticipantsDto.getProjectId(),
+                addParticipantsDto.getParticipantIds().toArray(ParticipantDto[]::new));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
      * [프로젝트 생성]
+     *
      * @param projectCreateDto
      * @param member
      * @return

@@ -9,6 +9,7 @@ import dragonfly.ews.domain.member.domain.MemberRole;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
+import dragonfly.ews.domain.result.postprocessor.AnalysisPostProcessor;
 import dragonfly.ews.domain.result.repository.AnalysisResultRepository;
 import jakarta.persistence.EntityManager;
 import jdk.jfr.Description;
@@ -49,7 +50,7 @@ class AnalysisResultServiceTest {
     @Autowired
     AnalysisResultRepository analysisResultRepository;
     @Autowired
-    AnalysisResultProcessor analysisResultProcessor;
+    AnalysisPostProcessor analysisResultProcessor;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -131,7 +132,7 @@ class AnalysisResultServiceTest {
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(result ->
-                        analysisResultProcessor.processResult((String) result, (Long) finalAnalysisResult.getId()));
+                        analysisResultProcessor.success((String) result, (Long) finalAnalysisResult.getId()));
         // then
         AnalysisResult findResult
                 = analysisResultRepository.findById(analysisResult.getId()).get();

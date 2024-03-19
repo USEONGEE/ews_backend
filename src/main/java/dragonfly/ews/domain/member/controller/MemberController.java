@@ -3,6 +3,7 @@ package dragonfly.ews.domain.member.controller;
 import com.google.common.annotations.VisibleForTesting;
 import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
+import dragonfly.ews.domain.member.dto.MemberResponseDto;
 import dragonfly.ews.domain.member.dto.MemberSignUpDto;
 import dragonfly.ews.domain.member.repository.MemberRepository;
 import dragonfly.ews.domain.member.service.MemberService;
@@ -21,10 +22,12 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
 
+
     /**
      * [회원 가입]
+     *
      * @param memberSignUpDto
-     * @exception RuntimeException 회원 가입에 실패했을 시
+     * @throws RuntimeException 회원 가입에 실패했을 시
      */
     @PostMapping("/sign-up")
     public ResponseEntity<SuccessResponse> signUp(@RequestBody MemberSignUpDto memberSignUpDto) {
@@ -32,8 +35,17 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<SuccessResponse> mypage(
+            @AuthenticationPrincipal(expression = "member") Member member) {
+        Member findMember = memberService.findOne(member.getId());
+        return new ResponseEntity<>(SuccessResponse.of(MemberResponseDto.of(findMember)), HttpStatus.OK);
+    }
+
+
     /**
      * [프로필 이미지 변경]
+     *
      * @param member
      * @param multipartFile
      * @return
