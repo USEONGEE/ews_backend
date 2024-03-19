@@ -4,6 +4,8 @@ package dragonfly.ews.domain.file.aop.utils;
 import dragonfly.ews.domain.file.aop.strategy.MemberFileStrategy;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
+import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
+import dragonfly.ews.domain.filelog.dto.MemberFileLogCreateDto;
 import dragonfly.ews.domain.member.domain.Member;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +47,12 @@ public class MemberFileManagerImpl implements MemberFileManager, MemberFileManag
     public Object findDtoById(Long memberId, Long memberFileId) {
         MemberFileStrategy memberFileStrategy = getFileStrategy();
         return memberFileStrategy.getMemberFileDtoById(memberId, memberFileId);
+    }
+
+    @Override
+    public void update(MemberFile memberFile, MemberFileUpdateDto memberFileUpdateDto) {
+        MemberFileStrategy memberFileStrategy = getFileStrategy();
+        memberFileStrategy.updateFile(memberFile, memberFileUpdateDto);
     }
 
 }

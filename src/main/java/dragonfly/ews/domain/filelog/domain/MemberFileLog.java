@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter(value = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberFileLog extends BaseEntity {
+public abstract class MemberFileLog extends BaseEntity {
     @Id
     @GeneratedValue
     @Column(name = "file_log_id")
@@ -34,6 +34,7 @@ public class MemberFileLog extends BaseEntity {
 
     public MemberFileLog(MemberFile memberFile, String savedName) {
         this.memberFile = memberFile;
+        memberFile.getMemberFileLogs().add(this);
         this.savedName = savedName;
     }
 
@@ -41,8 +42,12 @@ public class MemberFileLog extends BaseEntity {
         setDescription(description);
     }
 
-    public void changeValidated(boolean b) {
-        this.isValidated = b;
+    public void changeValidated(boolean bool) {
+        this.isValidated = bool;
     }
 
+    public void changeMemberFile(MemberFile memberFile) {
+        setMemberFile(memberFile);
+
+    }
 }

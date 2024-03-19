@@ -68,15 +68,8 @@ public class MemberFileService {
         // 검증
         memberFileManager.beforeUpdateValidate(memberFile, memberFileUpdateDto.getFile());
 
-        // 저장될 파일명 생성
-        String savedFilename = memberFileUtils.createSavedFilename(memberFile.getOriginalName());
-        // MemberFileLog 생성 및 저장
-        MemberFileLogCreateDto memberFileLogCreateDto =
-                MemberFileLogCreateDto.of(savedFilename, memberFileUpdateDto.getDescription());
-        memberFile.updateFile(memberFileLogCreateDto);
-        // 파일 저장
-        memberFileUtils.storeFile(memberFileUpdateDto.getFile(), savedFilename);
-
+        // 업데이트
+        memberFileManager.update(memberFile, memberFileUpdateDto);
         return true;
     }
 

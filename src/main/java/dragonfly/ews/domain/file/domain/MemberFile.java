@@ -51,24 +51,20 @@ public class MemberFile extends BaseEntity {
     private String description;
 
     public MemberFile(@NotNull Member owner, @NotNull String submittedFileName,
-                      @NotNull String originalFilename, @NotNull String savedFilename) {
+                      @NotNull String originalFilename) {
         this.fileName = submittedFileName;
         this.fileExtension = extractFileExtension(originalFilename);
         this.owner = owner;
         getOwner().getMemberFiles().add(this);
 
-        MemberFileLog memberFileLog = new MemberFileLog(this, savedFilename);
-        getMemberFileLogs().add(memberFileLog);
     }
 
-    public MemberFile(@NotNull Member owner, @NotNull String originalFilename, @NotNull String savedFilename) {
+    public MemberFile(@NotNull Member owner, @NotNull String originalFilename) {
         this.fileName = originalFilename;
         this.fileExtension = extractFileExtension(originalFilename);
         this.owner = owner;
         getOwner().getMemberFiles().add(this);
 
-        MemberFileLog memberFileLog = new MemberFileLog(this, savedFilename);
-        getMemberFileLogs().add(memberFileLog);
     }
 
     /**
@@ -106,12 +102,9 @@ public class MemberFile extends BaseEntity {
 
     // ==편의 메소드==
 
-    public void updateFile(MemberFileLogCreateDto memberFileLogCreateDto) {
-        String savedFileName = memberFileLogCreateDto.getSavedFileName();
-        validateSavedFilename(savedFileName);
-        MemberFileLog memberFileLog = new MemberFileLog(this, savedFileName);
-        memberFileLog.changeDescription(memberFileLogCreateDto.getDescription());
-        getMemberFileLogs().add(memberFileLog);
+    public void addMemberFileLog(MemberFileLog memberFileLog) {
+        this.memberFileLogs.add(memberFileLog);
+        memberFileLog.changeMemberFile(this);
     }
 
     public void changeProject(@NotNull Project project) {

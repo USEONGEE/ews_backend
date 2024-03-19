@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.filelog.domain.ExcelFileColumn;
 import dragonfly.ews.domain.file.domain.FileExtension;
-import dragonfly.ews.domain.file.repository.ExcelFileColumnRepository;
+import dragonfly.ews.domain.filelog.repository.ExcelFileColumnRepository;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
 import dragonfly.ews.domain.file.utils.FileUtils;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;

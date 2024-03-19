@@ -4,6 +4,8 @@ package dragonfly.ews.domain.file.aop.strategy;
 import dragonfly.ews.domain.base.aop.strategy.Strategy;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
+import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
+import dragonfly.ews.domain.filelog.dto.MemberFileLogCreateDto;
 import dragonfly.ews.domain.member.domain.Member;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,5 +38,7 @@ public interface MemberFileStrategy extends Strategy {
      */
 
     Object getMemberFileDtoById(Long memberId, Long memberFileId);
+
+    void updateFile(MemberFile memberFile, MemberFileUpdateDto memberFileUpdateDto);
 
 }

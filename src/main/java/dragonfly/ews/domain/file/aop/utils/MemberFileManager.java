@@ -2,6 +2,8 @@ package dragonfly.ews.domain.file.aop.utils;
 
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
+import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
+import dragonfly.ews.domain.filelog.dto.MemberFileLogCreateDto;
 import dragonfly.ews.domain.member.domain.Member;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,4 +20,6 @@ public interface MemberFileManager {
     void beforeUpdateValidate(MemberFile memberFile, MultipartFile target);
 
     Object findDtoById(Long memberId, Long memberFileId);
+
+    void update(MemberFile memberFile, MemberFileUpdateDto memberFileUpdateDto);
 }
