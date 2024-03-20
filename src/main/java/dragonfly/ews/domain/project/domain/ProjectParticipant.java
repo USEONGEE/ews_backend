@@ -27,4 +27,5 @@ public class ProjectParticipant {
         this.project = project;
         this.member = member;
     }
+
 }

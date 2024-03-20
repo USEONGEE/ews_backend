@@ -22,7 +22,7 @@ public class MemberResponseDto {
                 .id(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
-                .imageName(member.getImageName())
+                .imageName(member.getProfileImage())
                 .build();
     }
 }

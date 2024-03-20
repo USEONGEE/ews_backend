@@ -41,12 +41,15 @@ public class MemberService {
 
     @Transactional
     public boolean changeProfileImage(Long memberId, MultipartFile multipartFile) {
+        // 회원 조회
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NoSuchMemberException::new);
 
+        // 이미지 파일명 저장
         String savedFilename = fileUtils.createSavedFilename(multipartFile.getOriginalFilename());
         member.changeImageName(savedFilename);
 
+        // 이미지 저장
         fileUtils.storeFile(multipartFile, savedFilename);
 
         return true;
@@ -62,10 +65,6 @@ public class MemberService {
     }
 
     private void signUpValidation(MemberSignUpDto userSignUpDto) {
-        if (memberRepository.findByEmail(userSignUpDto.getEmail()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 이메일입니다.");
-        }
-
         if (memberRepository.findByNickname(userSignUpDto.getNickname()).isPresent()) {
             throw new RuntimeException("이미 존재하는 닉네임입니다.");
         }

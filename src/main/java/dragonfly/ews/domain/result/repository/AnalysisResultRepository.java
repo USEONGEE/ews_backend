@@ -13,7 +13,7 @@ public interface AnalysisResultRepository extends JpaRepository<AnalysisResult, 
     @Query("SELECT far FROM AnalysisResult far WHERE far.id = :analysisResultId AND " +
             "(far.memberFileLog.memberFile.owner.id = :memberId OR " +
             "far.memberFileLog.memberFile.project.id IN " +
-            "(SELECT pp.project.id FROM ParticipateProject pp WHERE pp.member.id = :memberId))")
+            "(SELECT pp.project.id FROM ProjectParticipant pp WHERE pp.member.id = :memberId))")
     Optional<AnalysisResult> findByIdAuth(@Param("memberId") Long memberId,
                                           @Param("analysisResultId") Long analysisResultId);
 

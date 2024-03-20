@@ -51,6 +51,9 @@ jwt:
 
 file:
   dir: D:/dragonfly/ews/ews_backend/file/
+  image:
+    dir: D:/dragonfly/ews/ews_backend/file/image/
+
 
 analysis:
   server:

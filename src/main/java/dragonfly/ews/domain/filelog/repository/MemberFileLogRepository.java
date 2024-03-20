@@ -14,7 +14,7 @@ public interface MemberFileLogRepository extends JpaRepository<MemberFileLog, Lo
     @Query("SELECT mfl FROM MemberFileLog mfl join fetch mfl.memberFile WHERE mfl.id = :memberFileLogId AND " +
             "(mfl.memberFile.owner.id = :memberId OR " +
             "mfl.memberFile.project.id IN " +
-            "(SELECT pp.project.id FROM ParticipateProject pp WHERE pp.member.id = :memberId))")
+            "(SELECT pp.project.id FROM ProjectParticipant pp WHERE pp.member.id = :memberId))")
 //    @Query("select mfl from MemberFileLog mfl where mfl.id = :memberFileLogId and mfl.memberFile.owner.id = :memberId")
     Optional<MemberFileLog> findByIdAuth(@Param("memberId") Long memberId,
                                          @Param("memberFileLogId") Long memberFileLogId);

@@ -31,10 +31,10 @@ public class Member extends BaseTimeEntity {
     private String refreshToken;
     private String provider;
     private String providerId;
-    private String imageName;
+    private String profileImage = "DefaultUserImage.jpg";
 
     @Enumerated(value = EnumType.STRING)
-    private MemberRole memberRole;
+    private MemberRole memberRole = MemberRole.ROLE_USER;
 
     @OneToMany(mappedBy = "owner")
     private List<MemberFile> memberFiles = new ArrayList<>();
@@ -42,8 +42,8 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "owner")
     private List<Project> myProjects = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
-    private List<ProjectParticipant> participateProjects = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<ProjectParticipant> projectParticipants = new ArrayList<>();
 
 
     public Member(String email, Integer age, MemberRole memberRole) {
@@ -89,6 +89,6 @@ public class Member extends BaseTimeEntity {
     }
 
     public void changeImageName(String imageName) {
-        setImageName(imageName);
+        setProfileImage(imageName);
     }
 }

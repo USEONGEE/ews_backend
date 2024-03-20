@@ -13,6 +13,7 @@ import dragonfly.ews.domain.project.exception.NoSuchProjectException;
 import dragonfly.ews.domain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectService {
     private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
@@ -50,6 +52,7 @@ public class ProjectService {
      * @param participantDtos
      * @return
      */
+    @Transactional
     public Project addParticipants(Long ownerId, Long projectId, ParticipantDto... participantDtos) {
         Project project = projectRepository.findByIdAuth(ownerId, projectId)
                 .orElseThrow(() -> new NoSuchProjectException("프로젝트를 찾을 수 없습니다."));

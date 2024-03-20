@@ -3,6 +3,7 @@ package dragonfly.ews.domain.project.controller;
 import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.dto.MemberResponseDto;
+import dragonfly.ews.domain.member.repository.MemberRepositoryApi;
 import dragonfly.ews.domain.project.domain.Project;
 import dragonfly.ews.domain.project.dto.*;
 import dragonfly.ews.domain.project.service.ProjectParticipantService;
@@ -14,7 +15,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +22,16 @@ import java.util.stream.Collectors;
 public class ProjectController {
     private final ProjectService projectService;
     private final ProjectParticipantService projectParticipantService;
+    private final MemberRepositoryApi memberRepositoryApi;
+
+    @PostMapping("/participant/delete")
+    public ResponseEntity<SuccessResponse> deleteParticipant(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @RequestBody ParticipantDeleteDto participantDeleteDto
+    ) {
+        return new ResponseEntity<>(SuccessResponse.of(projectParticipantService.deleteOne(member.getId(), participantDeleteDto)), HttpStatus.OK);
+    }
+
 
     /**
      * [프로젝트에 참여자 추가]
@@ -41,7 +51,6 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/")
 
     /**
      * [프로젝트 생성]
@@ -89,6 +98,7 @@ public class ProjectController {
 
     /**
      * [프로젝트에 참여한 회원 조회]
+     *
      * @param member
      * @param projectId
      * @return
@@ -98,7 +108,7 @@ public class ProjectController {
             @AuthenticationPrincipal(expression = "member") Member member,
             @PathVariable(value = "projectId") Long projectId
     ) {
-        List<ProjectParticipantResponseDto> dtos = projectParticipantService.findParticipates(member.getId(), projectId)
+        List<ProjectParticipantResponseDto> dtos = projectParticipantService.findParticipatesContainMember(member.getId(), projectId)
                 .stream()
                 .map(ProjectParticipantResponseDto::of)
                 .toList();
@@ -107,6 +117,7 @@ public class ProjectController {
 
     /**
      * [프로젝트 삭제]
+     *
      * @param member
      * @param projectId
      * @return
@@ -117,5 +128,26 @@ public class ProjectController {
             @PathVariable(value = "projectId") Long projectId) {
         return new ResponseEntity<>(SuccessResponse.of(projectService.deleteOne(member.getId(), projectId)),
                 HttpStatus.OK);
+    }
+
+    /**
+     * [새로운 참여자 조회]
+     *
+     * @param member
+     * @param email
+     * @return
+     */
+    @GetMapping("/search/new-participant")
+    public ResponseEntity<SuccessResponse> findParticipateByCondition(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @RequestParam(value = "email") String email,
+            @RequestParam(value = "project-id") Long projectId) {
+
+        List<MemberResponseDto> list = memberRepositoryApi.findNewParticipants(email, projectId)
+                .stream()
+                .map(MemberResponseDto::of)
+                .toList();
+
+        return new ResponseEntity<>(SuccessResponse.of(list), HttpStatus.OK);
     }
 }

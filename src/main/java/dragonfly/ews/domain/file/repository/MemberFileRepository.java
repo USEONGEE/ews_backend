@@ -15,7 +15,7 @@ public interface MemberFileRepository extends JpaRepository<MemberFile, Long> {
 
     @Query("SELECT mf FROM MemberFile mf WHERE mf.id = :fileId AND " +
             "(mf.owner.id = :memberId OR " +
-            "mf.project.id IN (SELECT pp.project.id FROM ParticipateProject pp WHERE pp.member.id = :memberId))")
+            "mf.project.id IN (SELECT pp.project.id FROM ProjectParticipant pp WHERE pp.member.id = :memberId))")
     Optional<MemberFile> findByIdAuth(@Param("memberId") Long memberId,
                                       @Param("fileId") Long memberFileId);
 
