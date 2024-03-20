@@ -102,12 +102,4 @@ public class ProjectService {
         projectRepository.delete(project);
         return true;
     }
-
-    public List<Member> findParticipates(Long memberId, Long projectId) {
-        projectRepository.findByIdAuth(memberId, projectId)
-                .orElseThrow(NoSuchProjectException::new);
-        List<Member> members = memberRepository.findByProjectId(projectId);
-        return members;
-    }
-
 }

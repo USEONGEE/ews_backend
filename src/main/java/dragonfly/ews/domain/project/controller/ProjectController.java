@@ -4,10 +4,8 @@ import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.member.dto.MemberResponseDto;
 import dragonfly.ews.domain.project.domain.Project;
-import dragonfly.ews.domain.project.dto.AddParticipantsDto;
-import dragonfly.ews.domain.project.dto.ParticipantDto;
-import dragonfly.ews.domain.project.dto.ProjectCreateDto;
-import dragonfly.ews.domain.project.dto.ProjectResponseDto;
+import dragonfly.ews.domain.project.dto.*;
+import dragonfly.ews.domain.project.service.ProjectParticipantService;
 import dragonfly.ews.domain.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,30 +14,34 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/project")
 public class ProjectController {
     private final ProjectService projectService;
+    private final ProjectParticipantService projectParticipantService;
 
     /**
      * [프로젝트에 참여자 추가]
      *
      * @param member
-     * @param addParticipantsDto
+     * @param participantCreateDto
      * @return
      */
     @PostMapping("/participant")
     public ResponseEntity<SuccessResponse> addParticipant(
             @AuthenticationPrincipal(expression = "member") Member member,
-            @RequestBody AddParticipantsDto addParticipantsDto
+            @RequestBody ParticipantCreateDto participantCreateDto
     ) {
         projectService.addParticipants(member.getId(),
-                addParticipantsDto.getProjectId(),
-                addParticipantsDto.getParticipantIds().toArray(ParticipantDto[]::new));
+                participantCreateDto.getProjectId(),
+                participantCreateDto.getParticipantIds().toArray(ParticipantDto[]::new));
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/")
 
     /**
      * [프로젝트 생성]
@@ -85,18 +87,30 @@ public class ProjectController {
                 HttpStatus.OK);
     }
 
+    /**
+     * [프로젝트에 참여한 회원 조회]
+     * @param member
+     * @param projectId
+     * @return
+     */
     @GetMapping("/{projectId}/participate")
     public ResponseEntity<SuccessResponse> findParticipates(
             @AuthenticationPrincipal(expression = "member") Member member,
             @PathVariable(value = "projectId") Long projectId
     ) {
-        List<MemberResponseDto> dtos = projectService.findParticipates(member.getId(), projectId)
+        List<ProjectParticipantResponseDto> dtos = projectParticipantService.findParticipates(member.getId(), projectId)
                 .stream()
-                .map(MemberResponseDto::of)
+                .map(ProjectParticipantResponseDto::of)
                 .toList();
         return new ResponseEntity<>(SuccessResponse.of(dtos), HttpStatus.OK);
     }
 
+    /**
+     * [프로젝트 삭제]
+     * @param member
+     * @param projectId
+     * @return
+     */
     @DeleteMapping("/{projectId}")
     public ResponseEntity<SuccessResponse> deleteOne(
             @AuthenticationPrincipal(expression = "member") Member member,

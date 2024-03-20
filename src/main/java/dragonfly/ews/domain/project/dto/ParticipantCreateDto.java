@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class AddParticipantsDto {
+public class ParticipantCreateDto {
     public Long projectId;
     public List<ParticipantDto> participantIds;
 }

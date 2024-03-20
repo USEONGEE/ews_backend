@@ -3,7 +3,7 @@ package dragonfly.ews.domain.member.domain;
 import dragonfly.ews.domain.base.BaseTimeEntity;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.member.exception.CannotChangePasswordException;
-import dragonfly.ews.domain.project.domain.ParticipateProject;
+import dragonfly.ews.domain.project.domain.ProjectParticipant;
 import dragonfly.ews.domain.project.domain.Project;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,7 +43,7 @@ public class Member extends BaseTimeEntity {
     private List<Project> myProjects = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<ParticipateProject> participateProjects = new ArrayList<>();
+    private List<ProjectParticipant> participateProjects = new ArrayList<>();
 
 
     public Member(String email, Integer age, MemberRole memberRole) {

@@ -19,6 +19,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findByEmailContaining(String emailFragment);
 
-    @Query("SELECT pp.member FROM ParticipateProject pp WHERE pp.project.id = :projectId")
-    List<Member> findByProjectId(@Param("projectId") Long projectId);
 }
