@@ -34,6 +34,7 @@ public class ProjectService {
      * @param projectCreateDto
      * @return
      */
+    @Transactional
     public Project createProject(Long ownerId, ProjectCreateDto projectCreateDto) {
         Member member = memberRepository.findById(ownerId)
                 .orElseThrow(() -> new NoSuchMemberException("회원을 찾을 수 없습니다."));
@@ -78,6 +79,7 @@ public class ProjectService {
      * @param memberFileIds
      * @return
      */
+    @Transactional
     public Project addMemberFile(Long ownerId, Long projectId, Long... memberFileIds) {
         Project project = projectRepository.findByIdAuth(ownerId, projectId)
                 .orElseThrow(() -> new NoSuchProjectException("프로젝트를 찾을 수 없습니다."));
@@ -99,10 +101,13 @@ public class ProjectService {
                 .orElseThrow(NoSuchProjectException::new);
     }
 
+    @Transactional
     public boolean deleteOne(Long memberId, Long projectId) {
-        Project project = projectRepository.findByIdAndOwnerId(projectId, memberId)
+//        projectRepository.deleteByOwner(memberId, projectId); // cascade가 동작 안 함
+        projectRepository.findByIdAuth(memberId, projectId)
                 .orElseThrow(NoSuchProjectException::new);
-        projectRepository.delete(project);
+        projectRepository.deleteById(projectId);
+
         return true;
     }
 }

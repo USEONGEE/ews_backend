@@ -57,6 +57,7 @@ public class ExcelMemberFileStrategy implements MemberFileStrategy {
 
         // 로그 생성
         ExcelMemberFileLog excelMemberFileLog = new ExcelMemberFileLog(memberFile, savedFilename);
+        excelMemberFileLog.changeDescription(memberFileCreateDto.getDescription());
         
         // ExcelMemberFileLog에 ExcelFileColumn 연결
         List<ExcelFileColumnCreateDto> dtos =

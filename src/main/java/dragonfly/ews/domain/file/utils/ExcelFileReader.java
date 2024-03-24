@@ -13,5 +13,5 @@ public interface ExcelFileReader extends FileReader {
 
     List<ExcelFileColumnCreateDto> extractExcelFileColumnCreateDto(MultipartFile multipartFile);
 
-
+    List<ExcelFileColumnCreateDto> extractExcelFileColumnCreateDto(String filePath);
 }

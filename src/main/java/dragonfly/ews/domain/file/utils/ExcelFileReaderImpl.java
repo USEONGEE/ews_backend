@@ -41,4 +41,16 @@ public class ExcelFileReaderImpl implements ExcelFileReader {
         }
         throw new CannotResolveFileReadException("파일을 처리할 수 없습니다.");
     }
+
+    @Override
+    public List<ExcelFileColumnCreateDto> extractExcelFileColumnCreateDto(String filePath) {
+        String fileExt = fileUtils.extractFileExtension(filePath);
+        FileExtension extension = FileExtension.fromString(fileExt);
+        for (ExcelFileReadProvider fileReader : fileReaders) {
+            if (fileReader.support(extension)) {
+                return fileReader.extractExcelFileColumnCreateDtos(filePath);
+            }
+        }
+        throw new CannotResolveFileReadException("파일을 처리할 수 없습니다.");
+    }
 }

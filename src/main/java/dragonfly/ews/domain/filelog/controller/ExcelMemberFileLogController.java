@@ -5,19 +5,16 @@ import dragonfly.ews.domain.file.utils.FileReader;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.dto.ExcelMemberFileLogResponseDto;
+import dragonfly.ews.domain.filelog.dto.SingleColumnTransformRequestDto;
 import dragonfly.ews.domain.filelog.service.ExcelMemberFileLogService;
 import dragonfly.ews.domain.filelog.service.MemberFileLogService;
 import dragonfly.ews.domain.member.domain.Member;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,6 +46,7 @@ public class ExcelMemberFileLogController {
 
     /**
      * [엑셀 데이터의 Column 데이터를 반환]
+     *
      * @param memberFileLogId
      * @param member
      * @return
@@ -61,5 +59,14 @@ public class ExcelMemberFileLogController {
         ExcelMemberFileLog excelMemberFileLog = excelMemberFileLogService.findOne(member.getId(), memberFileLogId);
         return new ResponseEntity<>(SuccessResponse.of(new ExcelMemberFileLogResponseDto(excelMemberFileLog)),
                 HttpStatus.OK);
+    }
+
+    @PostMapping("/columns/single-transform")
+    public ResponseEntity<SuccessResponse> singleTransform(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @RequestBody SingleColumnTransformRequestDto dto
+    ) {
+        return new ResponseEntity<>(SuccessResponse.of(
+                excelMemberFileLogService.singleTransform(member.getId(), dto)), HttpStatus.OK);
     }
 }

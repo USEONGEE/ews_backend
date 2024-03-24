@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -102,5 +104,38 @@ public class CsvFileReadProvider implements ExcelFileReadProvider {
         } catch (Exception e) {
             throw new CannotResolveFileReadException(e);
         }
+    }
+
+    @Override
+    public List<ExcelFileColumnCreateDto> extractExcelFileColumnCreateDtos(String filePath) {
+        List<ExcelFileColumnCreateDto> columnCreateDtos = new ArrayList<>();
+        try (BufferedReader fileReader = Files.newBufferedReader(Paths.get(filePath), StandardCharsets.UTF_8)) {
+            String headerLine = fileReader.readLine(); // 첫 번째 줄을 읽어 컬럼 이름을 추출합니다.
+            if (headerLine != null) {
+                List<String> columnNames = Arrays.asList(headerLine.split(","));
+                List<String> dataTypes = new ArrayList<>(); // 데이터 타입을 저장할 리스트를 초기화합니다.
+
+                String firstDataRow = fileReader.readLine(); // 두 번째 줄을 읽어 첫 번째 데이터 행을 추출합니다.
+                if (firstDataRow != null) {
+                    List<String> dataValues = new ArrayList<>(Arrays.asList(firstDataRow.split(",")));
+                    for (String data : dataValues) {
+                        String dataType = dataTypeProvider.determineDataType(data);
+                        dataTypes.add(dataType);
+                    }
+
+                    System.out.println("Data Types of the first row: " + dataTypes);
+                }
+                for (int i = 0; i < columnNames.size(); i++) {
+                    String columnName = columnNames.get(i);
+                    String dataType = i < dataTypes.size() ? dataTypes.get(i) : "String"; // dataTypes 리스트가 짧을 경우 기본값으로 "String" 사용
+                    columnCreateDtos.add(new ExcelFileColumnCreateDto(columnName, dataType));
+                }
+            } else {
+                throw new CannotSaveFileException("파일의 데이터가 올바르지 않습니다.");
+            }
+        } catch (IOException e) {
+            throw new CannotResolveFileReadException(e);
+        }
+        return columnCreateDtos;
     }
 }

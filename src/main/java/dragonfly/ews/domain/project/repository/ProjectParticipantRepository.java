@@ -16,6 +16,6 @@ public interface ProjectParticipantRepository extends JpaRepository<ProjectParti
     @Modifying
     @Transactional
     @Query("DELETE FROM ProjectParticipant pp WHERE pp.id = :participantId AND pp.project.id = :projectId")
-    boolean deleteByIdAndProjectId(@Param("participantId") Long participantId, @Param("projectId") Long projectId);
+    int deleteByIdAndProjectId(@Param("participantId") Long participantId, @Param("projectId") Long projectId);
 
 }

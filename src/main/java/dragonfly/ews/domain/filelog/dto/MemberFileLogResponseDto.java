@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * [MemberFileLog Response Dto]
+ */
 @Data@NoArgsConstructor
 public class MemberFileLogResponseDto {
     private Long id;

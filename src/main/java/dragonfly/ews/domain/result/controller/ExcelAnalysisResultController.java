@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExcelAnalysisResultController {
     private final ExcelAnalysisResultService excelAnalysisResultService;
 
+    /**
+     * [ExcelAnalysisResult 단건 조회]
+     * @param member
+     * @param excelAnalysisResultId
+     * @return
+     */
     @GetMapping("/{excelAnalysisResultId}")
     @LogMethodParams
     public ResponseEntity<SuccessResponse> findOne(

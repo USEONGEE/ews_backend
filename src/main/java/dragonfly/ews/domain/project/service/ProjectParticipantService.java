@@ -29,8 +29,8 @@ public class ProjectParticipantService {
                 .orElseThrow(NoSuchProjectException::new);
         // TODO 아래 코드 마무리하기
         // 삭제
-        if (!projectParticipantRepository.deleteByIdAndProjectId(participantDeleteDto.getProjectParticipantId(),
-                participantDeleteDto.getProjectId())) {
+        if (projectParticipantRepository.deleteByIdAndProjectId(participantDeleteDto.getProjectParticipantId(),
+                participantDeleteDto.getProjectId()) == 0) {
             throw new CannotDeleteException("삭제에 실패했습니다.");
         }
         return true;

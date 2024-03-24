@@ -131,4 +131,69 @@ public class XlsxFileReadProvider implements ExcelFileReadProvider {
             throw new CannotResolveFileReadException("파일을 읽을 수 없습니다.");
         }
     }
+
+    @Override
+    public List<ExcelFileColumnCreateDto> extractExcelFileColumnCreateDtos(String filePath) {
+        List<ExcelFileColumnCreateDto> columnCreateDtos = new ArrayList<>();
+        try (InputStream inputStream = new FileInputStream(filePath);
+             Workbook workbook = WorkbookFactory.create(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+
+            List<String> columnNames = new ArrayList<>();
+            List<String> dataTypes = new ArrayList<>();
+
+            if (rowIterator.hasNext()) {
+                Row headerRow = rowIterator.next();
+                for (Cell cell : headerRow) {
+                    columnNames.add(cell.getStringCellValue());
+                }
+            }
+
+            if (rowIterator.hasNext()) {
+                Row dataRow = rowIterator.next();
+                for (Cell cell : dataRow) {
+                    switch (cell.getCellType()) {
+                        case STRING:
+                            dataTypes.add("String");
+                            break;
+                        case NUMERIC:
+                            if (DateUtil.isCellDateFormatted(cell)) {
+                                dataTypes.add("Date");
+                            } else {
+                                dataTypes.add("Numeric");
+                            }
+                            break;
+                        case BOOLEAN:
+                            dataTypes.add("Boolean");
+                            break;
+                        case FORMULA:
+                            // Note: This is a simplification. In reality, you might need to evaluate the formula to determine its type.
+                            dataTypes.add("Formula");
+                            break;
+                        default:
+                            dataTypes.add("Unknown");
+                            break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < columnNames.size(); i++) {
+                String columnName = columnNames.get(i);
+                String dataType = i < dataTypes.size() ? dataTypes.get(i) : "String"; // If dataTypes list is shorter, use "String" as the default value
+                ExcelFileColumnCreateDto dto = new ExcelFileColumnCreateDto(columnName, dataType);
+                columnCreateDtos.add(dto);
+            }
+
+            if (columnNames.size() != columnCreateDtos.size()) {
+                throw new CannotSaveFileException("The data in the file is not correct.");
+            }
+        } catch (IOException e) {
+            throw new CannotResolveFileReadException("Unable to read the file.");
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while processing the file.", e);
+        }
+        return columnCreateDtos;
+    }
+
 }

@@ -16,4 +16,6 @@ public interface ExcelFileReadProvider {
     ExcelDataDto read(String filePath);
 
     List<ExcelFileColumnCreateDto> extractExcelFileColumnCreateDtos(MultipartFile multipartFile);
+
+    List<ExcelFileColumnCreateDto> extractExcelFileColumnCreateDtos(String filePath);
 }
