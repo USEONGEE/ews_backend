@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public interface MemberFileRepository extends JpaRepository<MemberFile, Long> {
 
+    // TODO Auth를 확인할 떄 사용자와 참여자를 분리해야한다.
     @Query("SELECT mf FROM MemberFile mf WHERE mf.id = :fileId AND " +
             "(mf.owner.id = :memberId OR " +
             "mf.project.id IN (SELECT pp.project.id FROM ProjectParticipant pp WHERE pp.member.id = :memberId))")

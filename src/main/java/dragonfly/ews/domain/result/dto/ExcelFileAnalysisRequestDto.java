@@ -34,6 +34,6 @@ public class ExcelFileAnalysisRequestDto {
     }
 
     public void addTargetColumns(AnalysisExcelFileColumnDto analysisExcelFileColumnDto) {
-        this.columns.add(analysisExcelFileColumnDto);
+        this.targetColumns.add(analysisExcelFileColumnDto);
     }
 }

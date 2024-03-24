@@ -36,6 +36,7 @@ public class WebClientConfig {
     public WebClient commonWebClient(HttpClient httpClient) {
         return WebClient
                 .builder()
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(100 * 1024 * 1024))
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
@@ -45,10 +46,10 @@ public class WebClientConfig {
     public HttpClient defaultHttpClient(ConnectionProvider provider) {
 
         return HttpClient.create(provider)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5_000)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,600_000)
                 .doOnConnected(conn ->
-                        conn.addHandlerLast(new ReadTimeoutHandler(5)) //읽기시간초과 타임아웃
-                                .addHandlerLast(new WriteTimeoutHandler(5)));
+                        conn.addHandlerLast(new ReadTimeoutHandler(600)) //읽기시간초과 타임아웃
+                                .addHandlerLast(new WriteTimeoutHandler(600)));
     }
 
     @Bean

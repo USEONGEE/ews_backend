@@ -23,8 +23,4 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("select p from Project p left join fetch p.memberFiles mf where p.id = :projectId and p.owner.id = :ownerId")
     Optional<Project> findByIdAndOwnerId(@Param("projectId") Long projectId, @Param("ownerId") Long ownerId);
 
-    @Modifying
-    @Transactional
-    @Query("delete from Project p where p.id = :projectId and p.owner.id = :ownerId")
-    int deleteByOwner(@Param("ownerId") Long ownerId, @Param("projectId") Long projectId);
 }

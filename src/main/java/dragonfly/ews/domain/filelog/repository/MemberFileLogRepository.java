@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberFileLogRepository extends JpaRepository<MemberFileLog, Long> {
+    // TODO Auth를 확인할 떄 사용자와 참여자를 분리해야한다.
     @Query("SELECT mfl FROM MemberFileLog mfl join fetch mfl.memberFile WHERE mfl.id = :memberFileLogId AND " +
             "(mfl.memberFile.owner.id = :memberId OR " +
             "mfl.memberFile.project.id IN " +

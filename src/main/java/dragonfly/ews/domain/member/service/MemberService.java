@@ -65,8 +65,8 @@ public class MemberService {
     }
 
     private void signUpValidation(MemberSignUpDto userSignUpDto) {
-        if (memberRepository.findByNickname(userSignUpDto.getNickname()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 닉네임입니다.");
+        if (memberRepository.findByEmail(userSignUpDto.getEmail()).isPresent()) {
+            throw new RuntimeException("이미 존재하는 메일입니다.");
         }
     }
 }
