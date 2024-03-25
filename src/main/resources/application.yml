@@ -12,6 +12,12 @@ spring:
     url: jdbc:h2:tcp://localhost/~/ews
     username: sa
     password: 12345
+    
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/ews?serverTimezone=UTC
+#    username: root
+
+
 
   security:
     oauth2:
@@ -29,8 +35,8 @@ logging:
   level:
     org:
       springframework:
-#        web: DEBUG
-#        security: DEBUG
+      #        web: DEBUG
+      #        security: DEBUG
 
       hibernate:
         SQL: debug
