@@ -74,7 +74,7 @@ public class AnalysisResultService {
         // 분석 파일 로그 조회
         MemberFileLog memberFileLog = memberFileLogRepository.findByIdAuth(memberId, userAnalysisRequestDto.getMemberFileLogId())
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
-        AnalysisResult analysisResult = new ExcelAnalysisResult(memberFileLog, AnalysisStatus.PROCESSING);
+        AnalysisResult analysisResult = new ExcelAnalysisResult(memberFileLog, AnalysisStatus.CREATED);
         analysisResult.changeDescription(userAnalysisRequestDto.getDescription());
 
         // 요청 메타데이터 생성
@@ -126,9 +126,7 @@ public class AnalysisResultService {
                 .body(BodyInserters.fromMultipartData(multipartBody))
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnError(error -> analysisPostProcessor.fail((Exception) error, analysisResult.getId()))
-                .subscribe(result ->
-                        analysisPostProcessor.success(result, analysisResult.getId()));
+                .doOnError(error -> analysisPostProcessor.fail((Exception) error, analysisResult.getId()));
 
         analysisResult.changeAnalysisStatus(AnalysisStatus.PROCESSING);
         return analysisResult;
