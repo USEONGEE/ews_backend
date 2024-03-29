@@ -3,9 +3,14 @@ package dragonfly.ews.domain.result.controller;
 import dragonfly.ews.common.handler.SuccessResponse;
 import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.member.domain.Member;
+import dragonfly.ews.domain.result.domain.AnalysisResultToken;
 import dragonfly.ews.domain.result.domain.ExcelAnalysisResult;
 import dragonfly.ews.domain.result.dto.ExcelAnalysisResultResponseDto;
+import dragonfly.ews.domain.result.repository.AnalysisResultTokenRepository;
 import dragonfly.ews.domain.result.service.ExcelAnalysisResultService;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -14,15 +19,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.NoSuchElementException;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/analysis/excel")
 public class ExcelAnalysisResultController {
     private final ExcelAnalysisResultService excelAnalysisResultService;
-    private final StringRedisTemplate redisTemplate;
+    private final AnalysisResultTokenRepository analysisResultTokenRepository;
 
     /**
      * [ExcelAnalysisResult 단건 조회]
+     *
      * @param member
      * @param excelAnalysisResultId
      * @return
@@ -35,15 +43,31 @@ public class ExcelAnalysisResultController {
         return new ResponseEntity<>(SuccessResponse.of(ExcelAnalysisResultResponseDto.of(find)), HttpStatus.OK);
     }
 
-    @GetMapping("/test")
-    public String test() {
-        // 값 저장
-        redisTemplate.opsForValue().set("key", "value");
+    /**
+     * []
+     * @param callbackDto
+     * @return
+     */
+    @PostMapping("/callback/{redisKey}/{redisValue}")
+    public ResponseEntity<SuccessResponse> handleAnalysisResultCallback(
+           @RequestBody CallbackDto callbackDto
+    ) {
+        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findByRedisKey(callbackDto.getRedisKey())
+                .orElseThrow(NoSuchElementException::new);
+        if (!callbackDto.getToken().equals(analysisResultToken.getToken())) {
+            throw new IllegalArgumentException("토큰값이 다릅니다");
+        }
+        excelAnalysisResultService.handleAnalysisResultCallback(analysisResultToken.getId(), callbackDto.getBody());
 
-        // 값 조회
-        String value = redisTemplate.opsForValue().get("key");
-        System.out.println("Retrieved value: " + value);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
-        return "ok";
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    private static class CallbackDto {
+        private String redisKey;
+        private String token;
+        private String body;
     }
 }

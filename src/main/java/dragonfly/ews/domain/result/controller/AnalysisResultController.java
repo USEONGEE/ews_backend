@@ -1,12 +1,12 @@
 package dragonfly.ews.domain.result.controller;
 
 import dragonfly.ews.common.handler.SuccessResponse;
+import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.file.exception.NoSuchFileException;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
 import dragonfly.ews.domain.result.domain.AnalysisResultFile;
 import dragonfly.ews.domain.result.dto.AnalysisStatusResponseDto;
-import dragonfly.ews.domain.result.dto.AnalysisExcelFileColumnDto;
 import dragonfly.ews.domain.result.dto.UserAnalysisRequestDto;
 import dragonfly.ews.domain.result.repository.AnalysisResultFileRepository;
 import dragonfly.ews.domain.result.service.AnalysisResultService;
@@ -22,7 +22,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

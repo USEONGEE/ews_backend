@@ -18,8 +18,6 @@ import java.util.List;
 public class UserAnalysisRequestDto {
     @NotNull
     private Long memberFileLogId;
-    @NotNull
-    private boolean all;
     @Size(min = 1, message = "selected ColumnIds must have at least one element")
     private List<Long> selectedColumnIds;
     @Size(min = 1, message = "selected ColumnIds must have at least one element")
