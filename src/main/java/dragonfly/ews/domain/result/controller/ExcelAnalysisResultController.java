@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -48,12 +49,17 @@ public class ExcelAnalysisResultController {
      * @param callbackDto
      * @return
      */
-    @PostMapping("/callback/{redisKey}/{redisValue}")
+    @PostMapping("/result-callback/{excelAnalysisResultId}")
+    @LogMethodParams
     public ResponseEntity<SuccessResponse> handleAnalysisResultCallback(
-           @RequestBody CallbackDto callbackDto
+           @RequestBody CallbackDto callbackDto,
+           @PathVariable(value = "excelAnalysisResultId") Long excelAnalysisResultId
     ) {
-        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findByRedisKey(callbackDto.getRedisKey())
+//        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findByRedisKey(callbackDto.getRedisKey())
+//                .orElseThrow(NoSuchElementException::new);
+        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findById(excelAnalysisResultId.intValue())
                 .orElseThrow(NoSuchElementException::new);
+
         if (!callbackDto.getToken().equals(analysisResultToken.getToken())) {
             throw new IllegalArgumentException("토큰값이 다릅니다");
         }
@@ -66,8 +72,7 @@ public class ExcelAnalysisResultController {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     private static class CallbackDto {
-        private String redisKey;
         private String token;
-        private String body;
+        private Map<String, String> body;
     }
 }

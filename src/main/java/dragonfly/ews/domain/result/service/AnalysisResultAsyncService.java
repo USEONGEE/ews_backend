@@ -82,9 +82,14 @@ public class AnalysisResultAsyncService implements AnalysisResultService {
                 .orElseThrow(() -> new IllegalStateException("해당 파일을 찾을 수 없습니다."));
         AnalysisResult analysisResult = new ExcelAnalysisResult(memberFileLog, AnalysisStatus.CREATED);
         analysisResult.changeDescription(userAnalysisRequestDto.getDescription());
+        analysisResultRepository.save(analysisResult);
 
         // redis에 요청 토큰 값 저장
-        AnalysisResultToken analysisResultToken = new AnalysisResultToken(analysisResult.getId(), UUID.randomUUID().toString());
+        AnalysisResultToken analysisResultToken = AnalysisResultToken.builder()
+                .id(analysisResult.getId())
+                .token(UUID.randomUUID().toString())
+                .expiration(3600L) // 1시간 = 3600초
+                .build();
         analysisResultTokenRepository.save(analysisResultToken);
 
         //// 메타 데이터 생성
@@ -95,7 +100,7 @@ public class AnalysisResultAsyncService implements AnalysisResultService {
         // redis token Id 추가
         String redisKey = analysisResultToken.getRedisKey();
         // callback Url 생성
-        String callbackUrl = createCallbackUrl(redisKey);
+        String callbackUrl = createCallbackUrl(analysisResultToken.getId());
         // excel column 추가
         List<AnalysisExcelFileColumnDto> analysisExcelFileColumnDtos
                 = fetchColumnDtos(userAnalysisRequestDto.getSelectedColumnIds());
@@ -103,8 +108,11 @@ public class AnalysisResultAsyncService implements AnalysisResultService {
         List<AnalysisExcelFileColumnDto> targetColumnDtos
                 = fetchColumnDtos(userAnalysisRequestDto.getTargetColumnIds());
 
-        ExcelFileAnalysisRequestDto analysisRequestDto
-                = new ExcelFileAnalysisRequestDto(extension, callbackUrl, redisKey, analysisExcelFileColumnDtos, targetColumnDtos);
+        ExcelFileAnalysisRequestDto analysisRequestDto = new ExcelFileAnalysisRequestDto(extension,
+                callbackUrl,
+                redisKey,
+                analysisExcelFileColumnDtos,
+                targetColumnDtos);
 
         // 파일 내용 JSON 문자열로 파싱
         String json = null;
@@ -191,7 +199,7 @@ public class AnalysisResultAsyncService implements AnalysisResultService {
     }
 
     private String createCallbackUrl(Object id) {
-        return String.format("{}callback/{}", serverUrl, id);
+        return String.format("%sanalysis/excel/result-callback/%s", serverUrl, id);
     }
 
 }

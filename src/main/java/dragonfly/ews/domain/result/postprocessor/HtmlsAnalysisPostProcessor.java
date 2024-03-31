@@ -2,6 +2,7 @@ package dragonfly.ews.domain.result.postprocessor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
 import dragonfly.ews.domain.result.domain.AnalysisResultFile;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
@@ -28,7 +29,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class HtmlsAnalysisPostProcessor implements AnalysisPostProcessor<String, Long> {
+public class HtmlsAnalysisPostProcessor implements AnalysisPostProcessor<Map<String, String>, Long> {
     private final ExcelAnalysisResultRepository repository;
     private final ObjectMapper objectMapper;
     private final String EXT = ".html";
@@ -36,12 +37,11 @@ public class HtmlsAnalysisPostProcessor implements AnalysisPostProcessor<String,
     @Value("${file.dir}")
     private String fileDir;
     @Transactional(noRollbackFor = IOException.class)
+    @LogMethodParams
     @Override
-    public void success(String result, Long id) {
+    public void success(Map<String, String> htmlFiles, Long id) {
         try {
             // JSON 문자열을 Map<String, String>으로 변환
-            Map<String, String> htmlFiles = objectMapper.readValue(result, new TypeReference<Map<String, String>>() {});
-
             // AnalysisResult 엔티티 조회
             ExcelAnalysisResult excelAnalysisResult = repository.findById(id)
                     .orElseThrow(() -> new IllegalStateException("AnalysisResult 엔티티를 찾을 수 없습니다."));

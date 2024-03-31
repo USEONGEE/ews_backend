@@ -1,5 +1,6 @@
 package dragonfly.ews.domain.result.service;
 
+import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.file.exception.NoSuchFileException;
 import dragonfly.ews.domain.result.domain.ExcelAnalysisResult;
 import dragonfly.ews.domain.result.postprocessor.AnalysisPostProcessor;
@@ -24,7 +25,9 @@ public class ExcelAnalysisResultService {
                 .orElseThrow(NoSuchFileException::new);
     }
 
-    public boolean handleAnalysisResultCallback(Long analysisResultId, String body) {
+    @Transactional
+    @LogMethodParams
+    public boolean handleAnalysisResultCallback(Long analysisResultId, Object body) {
         analysisPostProcessor.success(body, analysisResultId);
         return true;
     }
