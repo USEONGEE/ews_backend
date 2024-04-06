@@ -10,12 +10,12 @@ import dragonfly.ews.domain.file.exception.ExtensionMismatchException;
 import dragonfly.ews.domain.file.exception.FileNotInProjectException;
 import dragonfly.ews.domain.file.exception.NoFileNameException;
 import dragonfly.ews.domain.file.exception.NoSuchFileException;
-import dragonfly.ews.domain.filelog.repository.ExcelFileColumnRepository;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
 import dragonfly.ews.domain.file.utils.ExcelFileReader;
 import dragonfly.ews.domain.file.utils.FileUtils;
 import dragonfly.ews.domain.filelog.domain.ExcelFileColumn;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
+import dragonfly.ews.domain.filelog.repository.ExcelFileColumnRepository;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;
@@ -27,14 +27,12 @@ import java.util.List;
 
 import static dragonfly.ews.domain.file.domain.FileExtension.*;
 
-@Component
 @RequiredArgsConstructor
-public class ExcelMemberFileStrategy implements MemberFileStrategy {
+//@Component
+public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
     private final FileUtils memberFileUtils;
     private final ExcelFileReader excelFileReader;
     private final MemberFileRepository memberFileRepository;
-    private final ExcelFileColumnRepository excelFileColumnRepository;
-    private final MemberFileLogRepository memberFileLogRepository;
 
     @Override
     public boolean canSupport(FileExtension fileExtension) {
@@ -59,13 +57,9 @@ public class ExcelMemberFileStrategy implements MemberFileStrategy {
         ExcelMemberFileLog excelMemberFileLog = new ExcelMemberFileLog(memberFile, savedFilename);
         excelMemberFileLog.changeDescription(memberFileCreateDto.getDescription());
 
-        // ExcelMemberFileLog에 ExcelFileColumn 연결
-        List<ExcelFileColumnCreateDto> dtos =
-                excelFileReader.extractExcelFileColumnCreateDto(memberFileCreateDto.getFile());
-        for (ExcelFileColumnCreateDto dto : dtos) {
-            ExcelFileColumn excelFileColumn = new ExcelFileColumn(dto);
-            excelMemberFileLog.addColumn(excelFileColumn);
-        }
+        // TODO 분석 서버에 변환 요청 해야함.
+        // 분석 요청에는 callbackURI를 제공해야함.
+
         memberFile.addMemberFileLog(excelMemberFileLog);
 
         memberFileUtils.storeFile(memberFileCreateDto.getFile(), savedFilename);
@@ -104,15 +98,5 @@ public class ExcelMemberFileStrategy implements MemberFileStrategy {
     }
 
     @Override
-    public void updateFile(MemberFile memberFile, MemberFileUpdateDto memberFileUpdateDto) {
-        // 저장될 파일명 생성
-        String savedFilename = memberFileUtils.createSavedFilename(memberFile.getOriginalName());
-        // MemberFileLog 생성 및 저장
-        ExcelMemberFileLog excelMemberFileLog = new ExcelMemberFileLog(memberFile, savedFilename);
-        excelMemberFileLog.changeDescription(memberFileUpdateDto.getDescription());
-        memberFile.addMemberFileLog(excelMemberFileLog);
-        // 파일 저장
-        memberFileUtils.storeFile(memberFileUpdateDto.getFile(), savedFilename);
-    }
+    public void updateFile(MemberFile memberFile, MemberFileUpdateDto memberFileUpdateDto)
 }
-

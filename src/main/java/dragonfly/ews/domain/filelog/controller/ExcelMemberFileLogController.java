@@ -1,16 +1,17 @@
 package dragonfly.ews.domain.filelog.controller;
 
 import dragonfly.ews.common.handler.SuccessResponse;
+import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
 import dragonfly.ews.domain.file.utils.FileReader;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
+import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLogToken;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.dto.ExcelMemberFileLogResponseDto;
 import dragonfly.ews.domain.filelog.dto.SingleColumnTransformRequestDto;
+import dragonfly.ews.domain.filelog.repository.ExcelMemberFileLogTokenRepository;
 import dragonfly.ews.domain.filelog.service.ExcelMemberFileLogService;
 import dragonfly.ews.domain.filelog.service.MemberFileLogService;
 import dragonfly.ews.domain.member.domain.Member;
-import dragonfly.ews.domain.result.domain.AnalysisResultToken;
-import dragonfly.ews.domain.result.repository.AnalysisResultTokenRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -32,7 +32,7 @@ public class ExcelMemberFileLogController {
     private final MemberFileLogService memberFileLogService;
     private final ExcelMemberFileLogService excelMemberFileLogService;
     private final FileReader fileReadManager;
-    private final AnalysisResultTokenRepository analysisResultTokenRepository;
+    private final ExcelMemberFileLogTokenRepository excelMemberFileLogTokenRepository;
 
     @Value("${file.dir}")
     private String fileDir;
@@ -85,5 +85,29 @@ public class ExcelMemberFileLogController {
     ) {
         return new ResponseEntity<>(SuccessResponse.of(
                 excelMemberFileLogService.singleTransform(member.getId(), dto)), HttpStatus.OK);
+    }
+
+    @PostMapping("/columns-typecheck-callback/{excelMemberFileLogId}")
+    public ResponseEntity<SuccessResponse> handleTypeCheckCallback(
+            @RequestBody CallbackDto callbackDto,
+            @PathVariable(value = "excelMemberFileLogId") Long excelMemberFileLogId) {
+
+        // 접근 토큰 validation
+        ExcelMemberFileLogToken excelMemberFileLogToken = excelMemberFileLogTokenRepository.findById(excelMemberFileLogId)
+                .orElseThrow(NoSuchElementException::new);
+        if (!callbackDto.getToken().equals(excelMemberFileLogToken.getToken())) {
+            throw new IllegalArgumentException("토큰값이 다릅니다");
+        }
+
+
+        excelMemberFileLogService.updateColumn(excelMemberFileLogId, callbackDto.getDtos());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    private static class CallbackDto {
+        private String token;
+        private List<ExcelFileColumnCreateDto> dtos;
     }
 }

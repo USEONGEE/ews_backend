@@ -55,8 +55,7 @@ public class ExcelAnalysisResultController {
            @RequestBody CallbackDto callbackDto,
            @PathVariable(value = "excelAnalysisResultId") Long excelAnalysisResultId
     ) {
-//        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findByRedisKey(callbackDto.getRedisKey())
-//                .orElseThrow(NoSuchElementException::new);
+        // 접근 토큰 validation
         AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findById(excelAnalysisResultId)
                 .orElseThrow(NoSuchElementException::new);
 

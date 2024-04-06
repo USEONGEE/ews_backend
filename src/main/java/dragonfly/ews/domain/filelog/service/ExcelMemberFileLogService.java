@@ -1,8 +1,10 @@
 package dragonfly.ews.domain.filelog.service;
 
 import dragonfly.ews.domain.file.domain.FileExtension;
+import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
 import dragonfly.ews.domain.filelog.controller.ExcelMemberFileLogController;
+import dragonfly.ews.domain.filelog.domain.ExcelFileColumn;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
 import dragonfly.ews.domain.filelog.dto.SingleColumnTransformRequestDto;
 import dragonfly.ews.domain.filelog.exception.NoSuchMemberFileLogException;
@@ -55,6 +57,24 @@ public class ExcelMemberFileLogService {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+        return true;
+    }
+
+    /**
+     * [분석 서버에서 excel file 의 column을 validation 하고 excelColumn을 추가하는 과정]
+     * @param excelMemberFileLogId
+     * @param dtos
+     * @return
+     */
+    public boolean updateColumn(Long excelMemberFileLogId, List<ExcelFileColumnCreateDto> dtos) {
+        ExcelMemberFileLog excelMemberFileLog = excelMemberFileLogRepository.findById(excelMemberFileLogId)
+                .orElseThrow(NoSuchMemberFileLogException::new);
+
+        for (ExcelFileColumnCreateDto dto : dtos) {
+            ExcelFileColumn excelFileColumn = new ExcelFileColumn(dto);
+            excelMemberFileLog.addColumn(excelFileColumn);
         }
 
         return true;
