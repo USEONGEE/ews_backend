@@ -2,6 +2,7 @@ package dragonfly.ews.domain.filelog.service;
 
 import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
+import dragonfly.ews.domain.filelog.controller.ExcelMemberFileLogController;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
 import dragonfly.ews.domain.filelog.dto.SingleColumnTransformRequestDto;
 import dragonfly.ews.domain.filelog.exception.NoSuchMemberFileLogException;
@@ -11,11 +12,13 @@ import dragonfly.ews.domain.filelog.util.SingleColumnTransformer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ExcelMemberFileLogService {
     private final MemberFileLogRepository memberFileLogRepository;
     private final ExcelMemberFileLogRepository excelMemberFileLogRepository;
@@ -33,6 +36,13 @@ public class ExcelMemberFileLogService {
         return excelMemberFileLog;
     }
 
+    /**
+     * [엑셀 파일 Transformation]
+     *
+     * @param memberId
+     * @param dto
+     * @return
+     */
     public boolean singleTransform(Long memberId, SingleColumnTransformRequestDto dto) {
         FileExtension extension = memberFileRepository.findExtensionByMemberFileLogId(dto.getMemberFileLogId())
                 .orElseThrow(NoSuchMemberFileLogException::new);
@@ -49,4 +59,5 @@ public class ExcelMemberFileLogService {
 
         return true;
     }
+
 }

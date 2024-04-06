@@ -60,9 +60,11 @@ jwt:
     header: Authorization-refresh
 
 file:
-  dir: D:/dragonfly/ews/ews_backend/file/
+  #  dir: D:/dragonfly/ews/ews_backend/file/
+  dir: /Users/mousebook/Documents/GitHub/ews_backend/file/
   image:
-    dir: D:/dragonfly/ews/ews_backend/file/image/
+    #    dir: D:/dragonfly/ews/ews_backend/file/image/
+    dir: /Users/mousebook/Documents/GitHub/ews_backend/file/image/
 
 
 analysis:

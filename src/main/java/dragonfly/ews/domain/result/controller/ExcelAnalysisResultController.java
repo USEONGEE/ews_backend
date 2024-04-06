@@ -57,7 +57,7 @@ public class ExcelAnalysisResultController {
     ) {
 //        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findByRedisKey(callbackDto.getRedisKey())
 //                .orElseThrow(NoSuchElementException::new);
-        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findById(excelAnalysisResultId.intValue())
+        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findById(excelAnalysisResultId)
                 .orElseThrow(NoSuchElementException::new);
 
         if (!callbackDto.getToken().equals(analysisResultToken.getToken())) {

@@ -9,12 +9,21 @@ import dragonfly.ews.domain.filelog.dto.SingleColumnTransformRequestDto;
 import dragonfly.ews.domain.filelog.service.ExcelMemberFileLogService;
 import dragonfly.ews.domain.filelog.service.MemberFileLogService;
 import dragonfly.ews.domain.member.domain.Member;
+import dragonfly.ews.domain.result.domain.AnalysisResultToken;
+import dragonfly.ews.domain.result.repository.AnalysisResultTokenRepository;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +32,7 @@ public class ExcelMemberFileLogController {
     private final MemberFileLogService memberFileLogService;
     private final ExcelMemberFileLogService excelMemberFileLogService;
     private final FileReader fileReadManager;
+    private final AnalysisResultTokenRepository analysisResultTokenRepository;
 
     @Value("${file.dir}")
     private String fileDir;
@@ -61,6 +71,13 @@ public class ExcelMemberFileLogController {
                 HttpStatus.OK);
     }
 
+    /**
+     * [엑셀 데이터 Column Transformation]
+     *
+     * @param member
+     * @param dto
+     * @return
+     */
     @PostMapping("/columns/single-transform")
     public ResponseEntity<SuccessResponse> singleTransform(
             @AuthenticationPrincipal(expression = "member") Member member,

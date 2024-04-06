@@ -38,7 +38,7 @@ public class MemberFileLogContainResultsResponseDto {
         public AnalysisResultResponse(AnalysisResult analysisResult) {
             this.id = analysisResult.getId();
             this.status = analysisResult.getAnalysisStatus();
-            this.createdDate = analysisResult.getMemberFileLog().getCreatedDate();
+            this.createdDate = analysisResult.getCreatedDate();
             this.description = analysisResult.getDescription();
         }
     }

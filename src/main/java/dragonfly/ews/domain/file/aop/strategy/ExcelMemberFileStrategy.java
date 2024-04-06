@@ -59,6 +59,7 @@ public class ExcelMemberFileStrategy implements MemberFileStrategy {
         ExcelMemberFileLog excelMemberFileLog = new ExcelMemberFileLog(memberFile, savedFilename);
         excelMemberFileLog.changeDescription(memberFileCreateDto.getDescription());
         
+        //
         // ExcelMemberFileLog에 ExcelFileColumn 연결
         List<ExcelFileColumnCreateDto> dtos =
                 excelFileReader.extractExcelFileColumnCreateDto(memberFileCreateDto.getFile());
@@ -115,3 +116,4 @@ public class ExcelMemberFileStrategy implements MemberFileStrategy {
         memberFileUtils.storeFile(memberFileUpdateDto.getFile(), savedFilename);
     }
 }
+
