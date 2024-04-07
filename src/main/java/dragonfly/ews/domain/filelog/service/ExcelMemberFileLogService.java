@@ -11,6 +11,7 @@ import dragonfly.ews.domain.filelog.exception.NoSuchMemberFileLogException;
 import dragonfly.ews.domain.filelog.repository.ExcelMemberFileLogRepository;
 import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
 import dragonfly.ews.domain.filelog.util.SingleColumnTransformer;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -77,8 +78,17 @@ public class ExcelMemberFileLogService {
             ExcelFileColumn excelFileColumn = new ExcelFileColumn(dto);
             excelMemberFileLog.addColumn(excelFileColumn);
         }
+        return true;
+    }
+
+    @Transactional
+    public boolean handleAddColumnMetadataCallback(Long excelMemberFileLogId, String metadata) {
+        ExcelMemberFileLog excelMemberFileLog = excelMemberFileLogRepository.findById(excelMemberFileLogId)
+                .orElseThrow(NoSuchMemberFileLogException::new);
+        excelMemberFileLog.changeMetadata(metadata);
 
         return true;
     }
+
 
 }

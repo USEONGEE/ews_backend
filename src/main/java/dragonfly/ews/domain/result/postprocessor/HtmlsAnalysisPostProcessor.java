@@ -46,6 +46,7 @@ public class HtmlsAnalysisPostProcessor implements AnalysisPostProcessor<Map<Str
             ExcelAnalysisResult excelAnalysisResult = repository.findById(id)
                     .orElseThrow(() -> new IllegalStateException("AnalysisResult 엔티티를 찾을 수 없습니다."));
 
+            log.info("[HtmlsAnalysisPostProcessor] html 파일 갯수 = {}", htmlFiles.size());
             for (Map.Entry<String, String> entry : htmlFiles.entrySet()) {
                 String filename = entry.getKey() + EXT; // 파일 이름 설정
                 String htmlContent = entry.getValue(); // HTML 내용

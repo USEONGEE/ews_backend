@@ -7,6 +7,7 @@ import dragonfly.ews.domain.result.domain.AnalysisResultToken;
 import dragonfly.ews.domain.result.domain.ExcelAnalysisResult;
 import dragonfly.ews.domain.result.dto.ExcelAnalysisResultResponseDto;
 import dragonfly.ews.domain.result.repository.AnalysisResultTokenRepository;
+import dragonfly.ews.domain.result.service.AnalysisResultTokenService;
 import dragonfly.ews.domain.result.service.ExcelAnalysisResultService;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,6 +29,7 @@ import java.util.NoSuchElementException;
 public class ExcelAnalysisResultController {
     private final ExcelAnalysisResultService excelAnalysisResultService;
     private final AnalysisResultTokenRepository analysisResultTokenRepository;
+    private final AnalysisResultTokenService analysisResultTokenService;
 
     /**
      * [ExcelAnalysisResult 단건 조회]
@@ -45,24 +47,23 @@ public class ExcelAnalysisResultController {
     }
 
     /**
-     * []
+     * [분석 결과 리턴]
      * @param callbackDto
      * @return
      */
     @PostMapping("/result/callback/{excelAnalysisResultId}")
-    @LogMethodParams
     public ResponseEntity<SuccessResponse> handleAnalysisResultCallback(
            @RequestBody CallbackDto callbackDto,
            @PathVariable(value = "excelAnalysisResultId") Long excelAnalysisResultId
     ) {
-        // 접근 토큰 validation
-        AnalysisResultToken analysisResultToken = analysisResultTokenRepository.findById(excelAnalysisResultId)
-                .orElseThrow(NoSuchElementException::new);
+        // 토큰에서 추출하고 id 가져오기
+        Long tokenId = analysisResultTokenRepository.findById(excelAnalysisResultId)
+                .orElseThrow(NoSuchElementException::new)
+                .getId();
 
-        if (!callbackDto.getToken().equals(analysisResultToken.getToken())) {
-            throw new IllegalArgumentException("토큰값이 다릅니다");
-        }
-        excelAnalysisResultService.handleAnalysisResultCallback(analysisResultToken.getId(), callbackDto.getBody());
+        // 접근 토큰 validation
+        analysisResultTokenService.validateAndDeleteToken(excelAnalysisResultId, callbackDto.getToken());
+        excelAnalysisResultService.handleAnalysisResultCallback(tokenId, callbackDto.getBody());
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

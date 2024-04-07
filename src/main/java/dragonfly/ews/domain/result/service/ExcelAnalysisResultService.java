@@ -26,7 +26,6 @@ public class ExcelAnalysisResultService {
     }
 
     @Transactional
-    @LogMethodParams
     public boolean handleAnalysisResultCallback(Long analysisResultId, Object body) {
         analysisPostProcessor.success(body, analysisResultId);
         return true;

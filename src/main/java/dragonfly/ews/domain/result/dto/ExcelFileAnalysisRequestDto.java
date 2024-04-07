@@ -1,10 +1,7 @@
 package dragonfly.ews.domain.result.dto;
 
 import dragonfly.ews.domain.file.domain.FileExtension;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class ExcelFileAnalysisRequestDto {
     private FileExtension fileExtension;
     private String callbackUrl;

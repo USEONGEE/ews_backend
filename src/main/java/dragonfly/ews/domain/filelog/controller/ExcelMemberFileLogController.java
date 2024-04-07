@@ -11,12 +11,14 @@ import dragonfly.ews.domain.filelog.dto.ExcelMemberFileLogResponseDto;
 import dragonfly.ews.domain.filelog.dto.SingleColumnTransformRequestDto;
 import dragonfly.ews.domain.filelog.repository.ExcelMemberFileLogTokenRepository;
 import dragonfly.ews.domain.filelog.service.ExcelMemberFileLogService;
+import dragonfly.ews.domain.filelog.service.ExcelMemberFileLogTokenService;
 import dragonfly.ews.domain.filelog.service.MemberFileLogService;
 import dragonfly.ews.domain.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,7 @@ public class ExcelMemberFileLogController {
     private final ExcelMemberFileLogService excelMemberFileLogService;
     private final FileReader fileReadManager;
     private final ExcelMemberFileLogTokenRepository excelMemberFileLogTokenRepository;
+    private final ExcelMemberFileLogTokenService excelMemberFileLogTokenService;
 
     @Value("${file.dir}")
     private String fileDir;
@@ -96,20 +99,39 @@ public class ExcelMemberFileLogController {
      * @return
      */
     @PostMapping("/columns-type-check/callback/{excelMemberFileLogId}")
-    @LogMethodParams
     public ResponseEntity<SuccessResponse> handleTypeCheckCallback(
-            @RequestBody CallbackDto callbackDto,
+            @RequestBody TypeCheckCallbackDto callbackDto,
             @PathVariable(value = "excelMemberFileLogId") Long excelMemberFileLogId) {
 
-        // 접근 토큰 validation
-        ExcelMemberFileLogToken excelMemberFileLogToken = excelMemberFileLogTokenRepository.findById(excelMemberFileLogId)
-                .orElseThrow(NoSuchElementException::new);
-        if (!callbackDto.getToken().equals(excelMemberFileLogToken.getToken())) {
-            throw new IllegalArgumentException("토큰값이 다릅니다");
-        }
 
+        excelMemberFileLogTokenService.validateAndDeleteToken(excelMemberFileLogId, callbackDto.getToken());
         excelMemberFileLogService.updateColumn(excelMemberFileLogId, callbackDto.getDtos());
+
+
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+//    @PostMapping("/add-column-metadata/callback/{excelMemberFileLogId}")
+//    @LogMethodParams
+//    public ResponseEntity<SuccessResponse> handleAddColumnMetadataCallback(
+//            @RequestBody CallbackDto callbackDto,
+//            @PathVariable(value = "excelMemberFileLogId") Long excelMemberFileLogId) {
+//
+//        // 접근 토큰 validation
+//        excelMemberFileLogTokenService.validateAndDeleteToken(excelMemberFileLogId, callbackDto.getToken());
+//        excelMemberFileLogService.handleAddColumnMetadataCallback(excelMemberFileLogId, callbackDto.getMetadata());
+//
+//    }
+
+    /**
+     * [handleAddColumnMetadataCallback() 에서 사용되는 request DTO]
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    private static class CallbackDto
+    {
+        private String token;
+        private String metadata;
     }
 
     /**
@@ -117,7 +139,7 @@ public class ExcelMemberFileLogController {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    private static class CallbackDto {
+    private static class TypeCheckCallbackDto {
         private String token;
         private List<ExcelFileColumnCreateDto> dtos;
     }

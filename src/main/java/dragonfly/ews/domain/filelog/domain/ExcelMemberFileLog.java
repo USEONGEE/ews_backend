@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.java.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,6 +28,9 @@ public class ExcelMemberFileLog extends MemberFileLog {
     @CollectionTable(name = "AVAILABLE_MODEL", joinColumns = @JoinColumn(name = "excel_member_file_log_id"))
     private Set<String> availableModel = new HashSet<>();
 
+    @Lob
+    private String metadata;
+
     // TODO 현재 log가 어디까지 validation 이 되었는지를 저장하는 enum이 있어야 한다.
 
 
@@ -34,6 +38,9 @@ public class ExcelMemberFileLog extends MemberFileLog {
         super(memberFile, savedName);
     }
 
+    public void changeMetadata(String metadata) {
+        this.metadata = metadata;
+    }
 
     public void addColumn(ExcelFileColumn excelFileColumn) {
         columns.add(excelFileColumn);

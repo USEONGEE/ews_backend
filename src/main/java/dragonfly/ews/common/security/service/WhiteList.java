@@ -11,6 +11,6 @@ public class WhiteList {
             "/h2-console/**",
             "/member/sign-up",
             "/callback/**",
-            "/analysis/excel/result-callback/**",
+            "/analysis/excel/result/callback/**",
             "/filelog/excel/columns-type-check/callback/**"};
 }

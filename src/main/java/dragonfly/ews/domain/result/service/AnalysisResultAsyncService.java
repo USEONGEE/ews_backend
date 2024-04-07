@@ -108,11 +108,13 @@ public class AnalysisResultAsyncService implements AnalysisResultService {
         List<AnalysisExcelFileColumnDto> targetColumnDtos
                 = fetchColumnDtos(userAnalysisRequestDto.getTargetColumnIds());
 
-        ExcelFileAnalysisRequestDto analysisRequestDto = new ExcelFileAnalysisRequestDto(extension,
-                callbackUrl,
-                redisKey,
-                analysisExcelFileColumnDtos,
-                targetColumnDtos);
+        // builder 를 이용해서 ExcelFileAnalysisRequestDto 생성
+        ExcelFileAnalysisRequestDto analysisRequestDto = ExcelFileAnalysisRequestDto.builder()
+                .callbackUrl(callbackUrl)
+                .redisKey(redisKey)
+                .columns(analysisExcelFileColumnDtos)
+                .targetColumns(targetColumnDtos)
+                .build();
 
         // 파일 내용 JSON 문자열로 파싱
         String json = null;
