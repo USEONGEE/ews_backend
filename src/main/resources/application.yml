@@ -71,7 +71,7 @@ analysis:
   server:
     url: http://localhost:80/
     analysis-uri: files/analyze/v2/
-    column-check-uri: /column-check
+    column-check-uri: files/column-type-check/
 
 server:
   url: http://localhost:8080/

@@ -1,6 +1,7 @@
 package dragonfly.ews.domain.filelog.controller;
 
 import dragonfly.ews.common.handler.SuccessResponse;
+import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
 import dragonfly.ews.domain.file.utils.FileReader;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
@@ -87,7 +88,15 @@ public class ExcelMemberFileLogController {
                 excelMemberFileLogService.singleTransform(member.getId(), dto)), HttpStatus.OK);
     }
 
-    @PostMapping("/columns-typecheck-callback/{excelMemberFileLogId}")
+    /**
+     * [Excel 파일의 column type을 체크 요청 후 callback을 받음]
+     *
+     * @param callbackDto
+     * @param excelMemberFileLogId
+     * @return
+     */
+    @PostMapping("/columns-type-check/callback/{excelMemberFileLogId}")
+    @LogMethodParams
     public ResponseEntity<SuccessResponse> handleTypeCheckCallback(
             @RequestBody CallbackDto callbackDto,
             @PathVariable(value = "excelMemberFileLogId") Long excelMemberFileLogId) {
@@ -99,11 +108,13 @@ public class ExcelMemberFileLogController {
             throw new IllegalArgumentException("토큰값이 다릅니다");
         }
 
-
         excelMemberFileLogService.updateColumn(excelMemberFileLogId, callbackDto.getDtos());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * [handleTypeCheckCallback() 에서 사용되는 request DTO]
+     */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     private static class CallbackDto {

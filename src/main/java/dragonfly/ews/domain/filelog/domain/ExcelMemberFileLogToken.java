@@ -23,6 +23,6 @@ public class ExcelMemberFileLogToken {
      * @return
      */
     public String getRedisKey() {
-        return "analysisResultToken:" + this.id;
+        return "excelMemberFileLogToken:" + this.id;
     }
 }

@@ -199,7 +199,7 @@ public class AnalysisResultAsyncService implements AnalysisResultService {
     }
 
     private String createCallbackUrl(Object id) {
-        return String.format("%sanalysis/excel/result-callback/%s", serverUrl, id);
+        return String.format("%sanalysis/excel/result/callback/%s", serverUrl, id);
     }
 
 }

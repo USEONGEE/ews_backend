@@ -27,6 +27,8 @@ public class ExcelMemberFileLog extends MemberFileLog {
     @CollectionTable(name = "AVAILABLE_MODEL", joinColumns = @JoinColumn(name = "excel_member_file_log_id"))
     private Set<String> availableModel = new HashSet<>();
 
+    // TODO 현재 log가 어디까지 validation 이 되었는지를 저장하는 enum이 있어야 한다.
+
 
     public ExcelMemberFileLog(MemberFile memberFile, String savedName) {
         super(memberFile, savedName);

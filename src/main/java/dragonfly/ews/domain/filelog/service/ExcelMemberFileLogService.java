@@ -68,6 +68,7 @@ public class ExcelMemberFileLogService {
      * @param dtos
      * @return
      */
+    @Transactional
     public boolean updateColumn(Long excelMemberFileLogId, List<ExcelFileColumnCreateDto> dtos) {
         ExcelMemberFileLog excelMemberFileLog = excelMemberFileLogRepository.findById(excelMemberFileLogId)
                 .orElseThrow(NoSuchMemberFileLogException::new);

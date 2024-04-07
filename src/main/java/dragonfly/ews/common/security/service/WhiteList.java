@@ -10,5 +10,7 @@ public class WhiteList {
             "/favicon.ico",
             "/h2-console/**",
             "/member/sign-up",
-            "/analysis/excel/result-callback/**"};
+            "/callback/**",
+            "/analysis/excel/result-callback/**",
+            "/filelog/excel/columns-type-check/callback/**"};
 }

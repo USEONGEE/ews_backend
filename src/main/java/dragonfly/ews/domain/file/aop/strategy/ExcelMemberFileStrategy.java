@@ -27,7 +27,7 @@ import java.util.List;
 
 import static dragonfly.ews.domain.file.domain.FileExtension.*;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class ExcelMemberFileStrategy implements MemberFileStrategy {
     private final FileUtils memberFileUtils;

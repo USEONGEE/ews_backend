@@ -49,7 +49,7 @@ public class ExcelAnalysisResultController {
      * @param callbackDto
      * @return
      */
-    @PostMapping("/result-callback/{excelAnalysisResultId}")
+    @PostMapping("/result/callback/{excelAnalysisResultId}")
     @LogMethodParams
     public ResponseEntity<SuccessResponse> handleAnalysisResultCallback(
            @RequestBody CallbackDto callbackDto,

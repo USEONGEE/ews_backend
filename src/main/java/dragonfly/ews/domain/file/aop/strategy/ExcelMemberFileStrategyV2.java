@@ -2,7 +2,6 @@ package dragonfly.ews.domain.file.aop.strategy;
 
 import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
-import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
 import dragonfly.ews.domain.file.dto.MemberFileContainLogsResponseDto;
 import dragonfly.ews.domain.file.dto.MemberFileCreateDto;
 import dragonfly.ews.domain.file.dto.MemberFileUpdateDto;
@@ -11,28 +10,46 @@ import dragonfly.ews.domain.file.exception.FileNotInProjectException;
 import dragonfly.ews.domain.file.exception.NoFileNameException;
 import dragonfly.ews.domain.file.exception.NoSuchFileException;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
-import dragonfly.ews.domain.file.utils.ExcelFileReader;
 import dragonfly.ews.domain.file.utils.FileUtils;
-import dragonfly.ews.domain.filelog.domain.ExcelFileColumn;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
-import dragonfly.ews.domain.filelog.repository.ExcelFileColumnRepository;
-import dragonfly.ews.domain.filelog.repository.MemberFileLogRepository;
+import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLogToken;
+import dragonfly.ews.domain.filelog.repository.ExcelMemberFileLogRepository;
+import dragonfly.ews.domain.filelog.repository.ExcelMemberFileLogTokenRepository;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.List;
+import java.util.UUID;
 
 import static dragonfly.ews.domain.file.domain.FileExtension.*;
 
 @RequiredArgsConstructor
-//@Component
+@Component
 public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
     private final FileUtils memberFileUtils;
-    private final ExcelFileReader excelFileReader;
     private final MemberFileRepository memberFileRepository;
+    private final ExcelMemberFileLogTokenRepository excelMemberFileLogTokenRepository;
+    private final ExcelMemberFileLogRepository excelMemberFileLogRepository;
+
+    @Value("${server.url}")
+    private String serverUrl;
+
+    @Value("${analysis.server.url}")
+    private String analysisServerUri;
+    @Value("${analysis.server.column-check-uri}")
+    private String columnCheckUri;
+    private final WebClient webClient;
 
     @Override
     public boolean canSupport(FileExtension fileExtension) {
@@ -40,6 +57,7 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
     }
 
     @Override
+    @Transactional
     public MemberFile createMemberFile(Member owner, MemberFileCreateDto memberFileCreateDto) {
         // 파일명 검증
         String originalFilename = memberFileCreateDto.getFile().getOriginalFilename();
@@ -48,19 +66,43 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
         }
         String savedFilename = memberFileUtils.createSavedFilename(originalFilename);
 
-        // 엔티티 생성
+        // MemberFile 생성
         MemberFile memberFile = new MemberFile(owner,
                 memberFileCreateDto.getFileName(),
                 memberFileCreateDto.getFile().getOriginalFilename());
 
-        // 로그 생성
+        // MemberFileLog 생성 및 의존관계 주입
         ExcelMemberFileLog excelMemberFileLog = new ExcelMemberFileLog(memberFile, savedFilename);
         excelMemberFileLog.changeDescription(memberFileCreateDto.getDescription());
-
-        // TODO 분석 서버에 변환 요청 해야함.
-        // 분석 요청에는 callbackURI를 제공해야함.
-
         memberFile.addMemberFileLog(excelMemberFileLog);
+        memberFileRepository.save(memberFile);
+        // 인증 토큰 생성
+        ExcelMemberFileLogToken token = ExcelMemberFileLogToken.builder()
+                .id(excelMemberFileLog.getId())
+                .token(UUID.randomUUID().toString())
+                .expiration(3600L)
+                .build();
+        excelMemberFileLogTokenRepository.save(token);
+
+
+        // http body 작성
+        String fullPath = memberFileUtils.getFullPath(savedFilename);
+        String callbackUrl = createCallbackUrl(excelMemberFileLog.getId());
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", new FileSystemResource(fullPath));
+        builder.part("callbackUrl", callbackUrl);
+        builder.part("redisKey", token.getRedisKey());
+        MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
+
+        // 외부 서버에 column check 요청
+        // TODO 예외처리 해야함
+        webClient.post()
+                .uri(analysisServerUri + columnCheckUri)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(multipartBody))
+                .retrieve()
+                .bodyToMono(String.class)
+                .subscribe();
 
         memberFileUtils.storeFile(memberFileCreateDto.getFile(), savedFilename);
         return memberFile;
@@ -98,5 +140,18 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
     }
 
     @Override
-    public void updateFile(MemberFile memberFile, MemberFileUpdateDto memberFileUpdateDto)
+    public void updateFile(MemberFile memberFile, MemberFileUpdateDto memberFileUpdateDto) {
+        // 저장될 파일명 생성
+        String savedFilename = memberFileUtils.createSavedFilename(memberFile.getOriginalName());
+        // MemberFileLog 생성 및 저장
+        ExcelMemberFileLog excelMemberFileLog = new ExcelMemberFileLog(memberFile, savedFilename);
+        excelMemberFileLog.changeDescription(memberFileUpdateDto.getDescription());
+        memberFile.addMemberFileLog(excelMemberFileLog);
+        // 파일 저장
+        memberFileUtils.storeFile(memberFileUpdateDto.getFile(), savedFilename);
+    }
+
+    private String createCallbackUrl(Object id) {
+        return String.format("%sfilelog/excel/columns-type-check/callback/%s", serverUrl, id);
+    }
 }
