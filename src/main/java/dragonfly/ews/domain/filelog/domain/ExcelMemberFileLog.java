@@ -30,8 +30,9 @@ public class ExcelMemberFileLog extends MemberFileLog {
 
     @Lob
     private String metadata;
-
     // TODO 현재 log가 어디까지 validation 이 되었는지를 저장하는 enum이 있어야 한다.
+
+    // TODO 현재 파일에 대한 메타데이터를 저장해야한다. ExcelMemberFileLogMetadata를 만들어서 저장해야한다.
 
 
     public ExcelMemberFileLog(MemberFile memberFile, String savedName) {

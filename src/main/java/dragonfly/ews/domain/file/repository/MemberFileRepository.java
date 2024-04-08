@@ -35,4 +35,7 @@ public interface MemberFileRepository extends JpaRepository<MemberFile, Long> {
 
     @Query("select mf.fileExtension from MemberFile mf join mf.memberFileLogs mfl where mfl.id = :memberFileLogId")
     Optional<FileExtension> findExtensionByMemberFileLogId(@Param("memberFileLogId") Long memberFileLogId);
+
+    @Query("select mf from MemberFile mf join mf.memberFileLogs mfl where mfl.id = :memberFileLogId")
+    Optional<MemberFile> findMemberFileByMemberFileLogId(@Param("memberFileLogId") Long memberFileLogId);
 }

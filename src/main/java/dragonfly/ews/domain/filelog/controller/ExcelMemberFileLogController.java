@@ -1,11 +1,9 @@
 package dragonfly.ews.domain.filelog.controller;
 
 import dragonfly.ews.common.handler.SuccessResponse;
-import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
 import dragonfly.ews.domain.file.utils.FileReader;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
-import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLogToken;
 import dragonfly.ews.domain.filelog.domain.MemberFileLog;
 import dragonfly.ews.domain.filelog.dto.ExcelMemberFileLogResponseDto;
 import dragonfly.ews.domain.filelog.dto.SingleColumnTransformRequestDto;
@@ -14,11 +12,11 @@ import dragonfly.ews.domain.filelog.service.ExcelMemberFileLogService;
 import dragonfly.ews.domain.filelog.service.ExcelMemberFileLogTokenService;
 import dragonfly.ews.domain.filelog.service.MemberFileLogService;
 import dragonfly.ews.domain.member.domain.Member;
+import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +24,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -99,8 +96,8 @@ public class ExcelMemberFileLogController {
      * @return
      */
     @PostMapping("/columns-type-check/callback/{excelMemberFileLogId}")
-    public ResponseEntity<SuccessResponse> handleTypeCheckCallback(
-            @RequestBody TypeCheckCallbackDto callbackDto,
+    public ResponseEntity<SuccessResponse> handleTypeCheckSuccessCallback(
+            @RequestBody TypeCheckSuccessCallbackDto callbackDto,
             @PathVariable(value = "excelMemberFileLogId") Long excelMemberFileLogId) {
 
 
@@ -110,6 +107,24 @@ public class ExcelMemberFileLogController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    /**
+     * [Excel 파일의 column type 체크 실패 callback]
+     * @param callbackDto
+     * @param excelMemberFileLogId
+     * @return
+     */
+    @PostMapping("/columns-type-check/callback/{excelMemberFileLogId}/fail")
+    public ResponseEntity<SuccessResponse> handleTypeCheckFailCallback(
+            @RequestBody TypeCheckFailCallbackDto callbackDto,
+            @PathVariable(value = "excelMemberFileLogId") Long excelMemberFileLogId) {
+
+        excelMemberFileLogTokenService.validateAndDeleteToken(excelMemberFileLogId, callbackDto.getToken());
+        excelMemberFileLogService.handleTypeCheckFailCallback(excelMemberFileLogId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
 //    @PostMapping("/add-column-metadata/callback/{excelMemberFileLogId}")
 //    @LogMethodParams
@@ -128,8 +143,7 @@ public class ExcelMemberFileLogController {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    private static class CallbackDto
-    {
+    private static class CallbackDto {
         private String token;
         private String metadata;
     }
@@ -139,8 +153,17 @@ public class ExcelMemberFileLogController {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    private static class TypeCheckCallbackDto {
+    private static class TypeCheckSuccessCallbackDto {
         private String token;
         private List<ExcelFileColumnCreateDto> dtos;
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    private static class TypeCheckFailCallbackDto {
+        private String token;
+        private String message;
+        @Nullable
+        private String errorCode;
     }
 }

@@ -1,5 +1,6 @@
 package dragonfly.ews.domain.file.aop.strategy;
 
+import dragonfly.ews.domain.file.aop.postprocessor.ColumnTypeCheckPostProcessor;
 import dragonfly.ews.domain.file.domain.FileExtension;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.MemberFileContainLogsResponseDto;
@@ -41,6 +42,7 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
     private final MemberFileRepository memberFileRepository;
     private final ExcelMemberFileLogTokenRepository excelMemberFileLogTokenRepository;
     private final ExcelMemberFileLogRepository excelMemberFileLogRepository;
+    private final ColumnTypeCheckPostProcessor columnTypeCheckPostProcessor;
 
     @Value("${server.url}")
     private String serverUrl;
@@ -95,13 +97,13 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
         MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
 
         // 외부 서버에 column check 요청
-        // TODO 예외처리 해야함
         webClient.post()
                 .uri(analysisServerUri + columnCheckUri)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(multipartBody))
                 .retrieve()
                 .bodyToMono(String.class)
+                .doOnError(e -> columnTypeCheckPostProcessor.fail(e, memberFile.getId())) // 예외 발생시 memberfile 제거
                 .subscribe();
 
         memberFileUtils.storeFile(memberFileCreateDto.getFile(), savedFilename);

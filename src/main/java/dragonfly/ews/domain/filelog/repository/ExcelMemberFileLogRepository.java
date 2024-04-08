@@ -12,4 +12,5 @@ public interface ExcelMemberFileLogRepository extends JpaRepository<ExcelMemberF
 
     @Query("select emfl from ExcelMemberFileLog emfl left join fetch emfl.columns where emfl.id = :excelMemberFileLogId")
     Optional<ExcelMemberFileLog> findByIdContainColumn(@Param(value = "excelMemberFileLogId") Long excelMemberFileLogId);
+
 }

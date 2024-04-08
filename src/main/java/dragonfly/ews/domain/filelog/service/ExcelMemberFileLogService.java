@@ -1,6 +1,7 @@
 package dragonfly.ews.domain.filelog.service;
 
 import dragonfly.ews.domain.file.domain.FileExtension;
+import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.dto.ExcelFileColumnCreateDto;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
 import dragonfly.ews.domain.filelog.controller.ExcelMemberFileLogController;
@@ -91,4 +92,10 @@ public class ExcelMemberFileLogService {
     }
 
 
+    public boolean handleTypeCheckFailCallback(Long excelMemberFileLogId) {
+        MemberFile memberFile = memberFileRepository.findMemberFileByMemberFileLogId(excelMemberFileLogId)
+                .orElseThrow(NoSuchMemberFileLogException::new);
+        memberFileRepository.delete(memberFile);
+        return true;
+    }
 }
