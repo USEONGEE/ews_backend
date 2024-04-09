@@ -2,6 +2,8 @@ package dragonfly.ews.domain.file.aop.postprocessor;
 
 import dragonfly.ews.domain.file.domain.MemberFile;
 import dragonfly.ews.domain.file.repository.MemberFileRepository;
+import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLogValidationStep;
+import dragonfly.ews.domain.filelog.repository.ExcelMemberFileLogValidationStepRepository;
 import dragonfly.ews.domain.result.domain.AnalysisResult;
 import dragonfly.ews.domain.result.domain.AnalysisStatus;
 import dragonfly.ews.domain.result.exceptioon.CannotProcessAnalysisException;
@@ -17,14 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class ColumnTypeCheckPostProcessor {
-    private final MemberFileRepository memberFileRepository;
+    private final ExcelMemberFileLogValidationStepRepository excelMemberFileLogValidationStepRepository;
     @Transactional(noRollbackFor = CannotProcessAnalysisException.class)
     public void fail(Throwable e, Long id) {
         log.error("[ColumnTypeCheckPostProcessors.fail] 호출");
-        MemberFile memberFile = memberFileRepository.findById(id)
+        ExcelMemberFileLogValidationStep excelMemberFileLogValidationStep = excelMemberFileLogValidationStepRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("AnalysisResult 엔티티를 찾을 수 없습니다."));
-        memberFileRepository.delete(memberFile);
-        memberFileRepository.flush();
-        throw new CannotProcessAnalysisException("Data의 Type Check에 실패했습니다.", e);
+        excelMemberFileLogValidationStep.validationFail(e.getMessage(), 0);
     }
 }

@@ -1,13 +1,11 @@
 package dragonfly.ews.domain.filelog.domain;
 
-import dragonfly.ews.develop.aop.LogMethodParams;
 import dragonfly.ews.domain.file.domain.MemberFile;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.java.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,10 +28,37 @@ public class ExcelMemberFileLog extends MemberFileLog {
 
     @Lob
     private String metadata;
-    // TODO 현재 log가 어디까지 validation 이 되었는지를 저장하는 enum이 있어야 한다.
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "excelMemberFileLog", fetch = FetchType.EAGER)
+    private List<ExcelMemberFileLogValidationStep> excelMemberFileLogValidationSteps = new ArrayList<>();
 
     // TODO 현재 파일에 대한 메타데이터를 저장해야한다. ExcelMemberFileLogMetadata를 만들어서 저장해야한다.
 
+    /**
+     * [검증이 완료되었는지 확인]
+     *
+     * @return
+     */
+    public boolean isValidated() {
+        // 모든 검증이 완료되지 않았다면 false
+        if (!(ExcelMemberFileLogValidationType.values().length == excelMemberFileLogValidationSteps.size())) {
+            return false;
+        }
+
+        for (ExcelMemberFileLogValidationStep step : excelMemberFileLogValidationSteps) {
+            switch (step.getStatus()) {
+                case SUCCESS:
+                    continue;
+                case FAIL:
+                    throw new IllegalStateException("검증에 실패한 항목이 있습니다.");
+                case PROCESSING:
+                    return false;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + step.getStatus());
+            }
+        }
+        return true;
+    }
 
     public ExcelMemberFileLog(MemberFile memberFile, String savedName) {
         super(memberFile, savedName);

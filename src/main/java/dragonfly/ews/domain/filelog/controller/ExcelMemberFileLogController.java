@@ -32,7 +32,6 @@ public class ExcelMemberFileLogController {
     private final MemberFileLogService memberFileLogService;
     private final ExcelMemberFileLogService excelMemberFileLogService;
     private final FileReader fileReadManager;
-    private final ExcelMemberFileLogTokenRepository excelMemberFileLogTokenRepository;
     private final ExcelMemberFileLogTokenService excelMemberFileLogTokenService;
 
     @Value("${file.dir}")
@@ -41,8 +40,8 @@ public class ExcelMemberFileLogController {
     /**
      * [파일로그의 엑셀 데이터를 일부 조회]
      *
-     * @param memberFileLogId
-     * @param member
+     * @param memberFileLogId 파일로그 ID
+     * @param member         로그인한 사용자
      * @return
      */
     @GetMapping("/{memberFileLogId}/data")
@@ -58,8 +57,8 @@ public class ExcelMemberFileLogController {
     /**
      * [엑셀 데이터의 Column 데이터를 반환]
      *
-     * @param memberFileLogId
-     * @param member
+     * @param memberFileLogId 파일로그 ID
+     * @param member        로그인한 사용자
      * @return
      */
     @GetMapping("/{memberFileLogId}/columns")
@@ -75,8 +74,8 @@ public class ExcelMemberFileLogController {
     /**
      * [엑셀 데이터 Column Transformation]
      *
-     * @param member
-     * @param dto
+     * @param member 로그인한 사용자
+     * @param dto   변환 요청 DTO
      * @return
      */
     @PostMapping("/columns/single-transform")
@@ -91,8 +90,8 @@ public class ExcelMemberFileLogController {
     /**
      * [Excel 파일의 column type을 체크 요청 후 callback을 받음]
      *
-     * @param callbackDto
-     * @param excelMemberFileLogId
+     * @param callbackDto       callback DTO
+     * @param excelMemberFileLogId 파일로그 ID
      * @return
      */
     @PostMapping("/columns-type-check/callback/{excelMemberFileLogId}")
@@ -110,8 +109,8 @@ public class ExcelMemberFileLogController {
 
     /**
      * [Excel 파일의 column type 체크 실패 callback]
-     * @param callbackDto
-     * @param excelMemberFileLogId
+     * @param callbackDto      callback DTO
+     * @param excelMemberFileLogId 파일로그 ID
      * @return
      */
     @PostMapping("/columns-type-check/callback/{excelMemberFileLogId}/fail")

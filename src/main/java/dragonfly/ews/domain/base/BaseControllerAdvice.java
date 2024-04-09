@@ -4,6 +4,7 @@ import dragonfly.ews.common.handler.ErrorResponse;
 import dragonfly.ews.domain.file.exception.CannotSaveFileException;
 import dragonfly.ews.domain.file.exception.ExtensionMismatchException;
 import dragonfly.ews.domain.file.exception.NoSuchFileException;
+import dragonfly.ews.domain.filelog.exception.NoSuchMemberFileLogException;
 import dragonfly.ews.domain.member.exception.NoSuchMemberException;
 import dragonfly.ews.domain.project.exception.NoSuchProjectException;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,11 @@ public class BaseControllerAdvice {
     @ExceptionHandler
     public ResponseEntity handleException(NoSuchProjectException e) {
         return new ResponseEntity(ErrorResponse.of(0, e.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity handleException(NoSuchMemberFileLogException e) {
+        return new ResponseEntity(ErrorResponse.of(0, e.getMessage(), null), HttpStatus.BAD_REQUEST);
     }
 
     /**

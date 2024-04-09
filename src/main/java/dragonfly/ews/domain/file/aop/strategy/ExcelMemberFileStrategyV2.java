@@ -16,6 +16,7 @@ import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLog;
 import dragonfly.ews.domain.filelog.domain.ExcelMemberFileLogToken;
 import dragonfly.ews.domain.filelog.repository.ExcelMemberFileLogRepository;
 import dragonfly.ews.domain.filelog.repository.ExcelMemberFileLogTokenRepository;
+import dragonfly.ews.domain.filelog.validation.ExcelMemberFileLogValidationStrategy;
 import dragonfly.ews.domain.member.domain.Member;
 import dragonfly.ews.domain.project.domain.Project;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
 import java.util.UUID;
 
 import static dragonfly.ews.domain.file.domain.FileExtension.*;
@@ -41,18 +43,7 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
     private final FileUtils memberFileUtils;
     private final MemberFileRepository memberFileRepository;
     private final ExcelMemberFileLogTokenRepository excelMemberFileLogTokenRepository;
-    private final ExcelMemberFileLogRepository excelMemberFileLogRepository;
-    private final ColumnTypeCheckPostProcessor columnTypeCheckPostProcessor;
-
-    @Value("${server.url}")
-    private String serverUrl;
-
-    @Value("${analysis.server.url}")
-    private String analysisServerUri;
-    @Value("${analysis.server.column-check-uri}")
-    private String columnCheckUri;
-    private final WebClient webClient;
-
+    private final List<ExcelMemberFileLogValidationStrategy> validationStrategies;
     @Override
     public boolean canSupport(FileExtension fileExtension) {
         return fileExtension == CSV || fileExtension == XLS || fileExtension == XLSX;
@@ -78,33 +69,10 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
         excelMemberFileLog.changeDescription(memberFileCreateDto.getDescription());
         memberFile.addMemberFileLog(excelMemberFileLog);
         memberFileRepository.save(memberFile);
-        // 인증 토큰 생성
-        ExcelMemberFileLogToken token = ExcelMemberFileLogToken.builder()
-                .id(excelMemberFileLog.getId())
-                .token(UUID.randomUUID().toString())
-                .expiration(3600L)
-                .build();
-        excelMemberFileLogTokenRepository.save(token);
 
-
-        // http body 작성
-        String fullPath = memberFileUtils.getFullPath(savedFilename);
-        String callbackUrl = createCallbackUrl(excelMemberFileLog.getId());
-        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("file", new FileSystemResource(fullPath));
-        builder.part("callbackUrl", callbackUrl);
-        builder.part("redisKey", token.getRedisKey());
-        MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
-
-        // 외부 서버에 column check 요청
-        webClient.post()
-                .uri(analysisServerUri + columnCheckUri)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(multipartBody))
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnError(e -> columnTypeCheckPostProcessor.fail(e, memberFile.getId())) // 예외 발생시 memberfile 제거
-                .subscribe();
+        // 검증 수행
+        // TODO 엔티티가 생성되기 전에 검증을 수행하게 하려면 어떻게 해야할까?
+        validationStrategies.forEach(strategy -> strategy.validate(excelMemberFileLog.getId()));
 
         memberFileUtils.storeFile(memberFileCreateDto.getFile(), savedFilename);
         return memberFile;
@@ -153,7 +121,5 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
         memberFileUtils.storeFile(memberFileUpdateDto.getFile(), savedFilename);
     }
 
-    private String createCallbackUrl(Object id) {
-        return String.format("%sfilelog/excel/columns-type-check/callback/%s", serverUrl, id);
-    }
+
 }
