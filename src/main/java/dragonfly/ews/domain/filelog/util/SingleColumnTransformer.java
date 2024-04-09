@@ -9,7 +9,6 @@ import java.io.IOException;
 
 /**
  * [엑셀 데이터를 transform]
- * 
  * <br/> 임시로 사용. 나중에는 외부 서버로 해당 프로세스를 빼야함
  */
 public interface SingleColumnTransformer {

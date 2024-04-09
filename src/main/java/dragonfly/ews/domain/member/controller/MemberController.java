@@ -98,6 +98,11 @@ public class MemberController {
         return new ResponseEntity<>(SuccessResponse.of(list), HttpStatus.OK);
     }
 
+    /**
+     * [프로필 이미지 조회]
+     * @param savedName
+     * @return
+     */
     @GetMapping("/profile/images/{savedName:.+}")
     public ResponseEntity<Resource> getImage(@PathVariable(value = "savedName") String savedName) {
         Path imagePath = Paths.get(imageDir, savedName).normalize();

@@ -66,7 +66,7 @@ public class MemberService {
 
     private void signUpValidation(MemberSignUpDto userSignUpDto) {
         if (memberRepository.findByEmail(userSignUpDto.getEmail()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 메일입니다.");
+            throw new IllegalArgumentException("이미 존재하는 메일입니다.");
         }
     }
 }

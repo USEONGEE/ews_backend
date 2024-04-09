@@ -64,7 +64,7 @@ public class ExcelMemberFileStrategyV2 implements MemberFileStrategy {
         // 파일명 검증
         String originalFilename = memberFileCreateDto.getFile().getOriginalFilename();
         if (originalFilename.isEmpty()) {
-            throw new NoFileNameException("사용자가 제공한 파일에 이름이 없습니다.");
+            throw new IllegalArgumentException("사용자가 제공한 파일에 이름이 없습니다.");
         }
         String savedFilename = memberFileUtils.createSavedFilename(originalFilename);
 

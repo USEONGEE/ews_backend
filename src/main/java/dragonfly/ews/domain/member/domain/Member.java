@@ -63,12 +63,11 @@ public class Member extends BaseTimeEntity {
 
     /**
      * [비밀번호 암호화]
-     * <p/>같은 비밀번호로는 변경할 수 없다.
-     * @exception CannotChangePasswordException
+     * @exception IllegalArgumentException 같은 비밀번호로 변경할 수 없다.
      */
     public void changePassword(PasswordEncoder passwordEncoder, String newPassword) {
         if (passwordEncoder.matches(newPassword ,getPassword())) {
-            throw new CannotChangePasswordException("같은 비밀번호로 변경할 수 없습니다.");
+            throw new IllegalArgumentException("같은 비밀번호로 변경할 수 없습니다.");
         }
 
         setPassword(passwordEncoder.encode(newPassword));

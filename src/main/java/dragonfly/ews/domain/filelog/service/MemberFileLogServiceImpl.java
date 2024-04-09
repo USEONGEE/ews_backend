@@ -19,8 +19,8 @@ public class MemberFileLogServiceImpl implements MemberFileLogService {
 
     /**
      * [단건 조회]
-     * @param memberId
-     * @param memberFileLogId
+     * @param memberId 로그인한 사용자의 ID
+     * @param memberFileLogId 파일로그 아이디
      * @return
      */
     @Override
@@ -31,8 +31,8 @@ public class MemberFileLogServiceImpl implements MemberFileLogService {
 
     /**
      * [결과 파일 포함 조회]
-     * @param memberId
-     * @param memberFileLogId
+     * @param memberId 로그인한 사용자의 ID
+     * @param memberFileLogId 파일로그 아이디
      * @return
      */
     @Override
@@ -45,8 +45,8 @@ public class MemberFileLogServiceImpl implements MemberFileLogService {
 
     /**
      * [전체 조회 - 페이징]
-     * @param memberId
-     * @param pageable
+     * @param memberId 로그인한 사용자의 ID
+     * @param pageable 페이징 정보
      * @return
      */
     @Override

@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public class ErrorResponse {
-    private final int code;
+    private final int code; // 사전 정의된 에러 코드
     private final String msg;
     private final Object data;
 
-    public static ErrorResponse of(HttpStatus code, String msg, Object data) {
-        return new ErrorResponse(code.value(), msg, data);
+    public static ErrorResponse of(int code, String msg, Object data) {
+        return new ErrorResponse(code, msg, data);
     }
 }

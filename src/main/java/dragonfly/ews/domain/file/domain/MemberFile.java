@@ -91,7 +91,7 @@ public class MemberFile extends BaseEntity {
      * <br/> 파일이 업데이트 및 저장되기 전에 확인되어야 한다.
      * <br/> 파일의 확장자가 기존과 동일하지 않으면 예외 발생.
      *
-     * @throws dragonfly.ews.domain.file.exception.ExtensionNotEqualException
+     * @throws dragonfly.ews.domain.file.exception.ExtensionNotFoundException
      */
     private void validateSavedFilename(String savedFilename) {
         FileExtension ext = extractFileExtension(savedFilename);

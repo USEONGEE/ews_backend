@@ -47,7 +47,7 @@ public class FileUtils {
             file.transferTo(new File(fileDir + savedFilename));
         } catch (IOException e) {
             log.error("파일 저장에 문제가 발생했습니다.");
-            throw new CannotSaveFileException(e);
+            throw new CannotSaveFileException("파일 저장에 문제가 발생했습니다.", e);
         }
     }
 

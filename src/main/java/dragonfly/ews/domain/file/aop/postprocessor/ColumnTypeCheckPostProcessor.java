@@ -25,6 +25,6 @@ public class ColumnTypeCheckPostProcessor {
                 .orElseThrow(() -> new IllegalStateException("AnalysisResult 엔티티를 찾을 수 없습니다."));
         memberFileRepository.delete(memberFile);
         memberFileRepository.flush();
-        throw new CannotProcessAnalysisException("분석 서버에 요청에 실패했습니다.", e);
+        throw new CannotProcessAnalysisException("Data의 Type Check에 실패했습니다.", e);
     }
 }

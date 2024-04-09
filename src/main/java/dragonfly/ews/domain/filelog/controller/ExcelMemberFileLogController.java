@@ -158,6 +158,9 @@ public class ExcelMemberFileLogController {
         private List<ExcelFileColumnCreateDto> dtos;
     }
 
+    /**
+     * [handleTypeCheckFailCallback() 에서 사용되는 request DTO]
+     */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     private static class TypeCheckFailCallbackDto {

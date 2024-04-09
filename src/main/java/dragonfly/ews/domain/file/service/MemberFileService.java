@@ -37,6 +37,12 @@ public class MemberFileService {
     private final MemberFileManager memberFileManager;
 
 
+    /**
+     * [사용자가 저장한 파일 저장]
+     * @param memberId
+     * @param memberFileCreateDto
+     * @return
+     */
     @UseMemberFileManager
     @HasMultipartFile
     @Transactional
@@ -58,6 +64,12 @@ public class MemberFileService {
         return true;
     }
 
+    /**
+     * [사용자가 저장한 파일 업데이트]
+     * @param memberId
+     * @param memberFileUpdateDto
+     * @return
+     */
     @UseMemberFileManager
     @HasMultipartFile
     @Transactional
@@ -73,6 +85,12 @@ public class MemberFileService {
         return true;
     }
 
+    /**
+     * [사용자가 저장한 파일 세부 조회]
+     * @param memberId
+     * @param memberFileId
+     * @return
+     */
     @UseMemberFileManager
     public Object findByIdContainLogs(Long memberId, Long memberFileId) {
         return memberFileManager.findDtoById(memberId, memberFileId);

@@ -23,17 +23,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/filelog")
 public class MemberFileLogController {
-    @Value("${file.dir}")
-    private String fileDir;
-
     private final MemberFileLogService memberFileLogService;
-    private final ExcelFileReader fileReadManager;
 
     /**
      * [파일로그 세부 조회]
      *
-     * @param memberFileLogId
-     * @param member
+     * @param memberFileLogId 파일로그 아이디
+     * @param member         로그인한 사용자
      * @return
      */
     @GetMapping("/{memberFileLogId}")
@@ -46,6 +42,12 @@ public class MemberFileLogController {
                 HttpStatus.OK);
     }
 
+    /**
+     * [파일 로그 페이징으로 조회]
+     * @param member 로그인한 사용자
+     * @param pageable 페이징 정보
+     * @return
+     */
     @GetMapping
     public ResponseEntity<SuccessResponse> findPaging(
             @AuthenticationPrincipal(expression = "member") Member member,
